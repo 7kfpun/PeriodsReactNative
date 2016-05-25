@@ -7,17 +7,20 @@ import {
   View,
 } from 'react-native';
 
+// Flux
+import PeriodActions from '../actions/period-actions';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
-import DateTimePicker from 'react-native-datetime';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import NavigationBar from 'react-native-navbar';
-import Slider from 'react-native-slider';
 import {
   Cell,
   Section,
   TableView,
 } from 'react-native-tableview-simple';
+import DateTimePicker from 'react-native-datetime';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import NavigationBar from 'react-native-navbar';
+import Slider from 'react-native-slider';
 
 import moment from 'moment';
 
@@ -28,20 +31,28 @@ export default class EditHistoryView extends React.Component {
     this.state = {
       date: new Date(),
       text: '',
-      value: 3,
+      length: 3,
     };
     this.picker = null;
   }
 
   showDatePicker() {
     var date = this.state.date;
-    this.picker.showDatePicker(date, (d)=>{
-      this.setState({date: d});
+    this.picker.showDatePicker(date, (d) => {
+      if (moment().diff(d) < 0) {
+        this.setState({date: new Date()});
+      } else {
+        this.setState({date: d});
+      }
     });
   }
 
   save() {
     console.log('Save');
+    PeriodActions.addPeriod({
+      date: [2015, 0, 12],
+      length: this.state.length,
+    });
     Actions.pop();
   }
 
@@ -96,8 +107,8 @@ export default class EditHistoryView extends React.Component {
                 thumbStyle={sliderStyles.thumb}
                 minimumTrackTintColor="#31a4db"
                 thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.value}
-                onValueChange={(value) => this.setState({value})}
+                value={this.state.length}
+                onValueChange={(length) => this.setState({length})}
                 minimumValue={1}
                 maximumValue={30}
                 step={1}

@@ -15,12 +15,16 @@ import CycleLengthSettingsView from './app/views/settings/cycle-length';
 import OvulationFertileSettingsView from './app/views/settings/ovulation-fertile';
 
 // @todo remove when RN upstream is fixed
-console.ignoredYellowBox = ['Warning: Failed propType: SceneView'];
+console.ignoredYellowBox = [
+  'Warning: In next release empty section headers',
+  'Warning: Failed propType: Invalid prop `prevButtonText`',
+  'Warning: Failed propType: Invalid prop `nextButtonText`',
+];
 
 const scenes = Actions.create(
   <Scene key="root" hideNavBar={true}>
     <Scene key="main" title="Period Calendar" component={Main} initial={true} />
-    <Scene key="addPeriod" title="Add " component={AddPeriodView} />
+    <Scene key="addPeriod" title="Add Period" component={AddPeriodView} />
     <Scene key="editHistory" title="Edit" component={EditHistoryView} />
     <Scene key="settings" title="Settings" component={SettingsView} />
     <Scene key="periodLengthSettings" title="Period Length" component={PeriodLengthSettingsView} />

@@ -26,7 +26,7 @@ export default class EditHistoryView extends React.Component {
     super(props);
 
     this.state = {
-      date: new Date(),
+      date: this.props.date,
       text: '',
       value: 3,
     };

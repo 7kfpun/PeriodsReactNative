@@ -9,6 +9,9 @@ import {
   View,
 } from 'react-native';
 
+// Flux
+import PeriodStore from '../stores/period-store';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import Button from 'apsl-react-native-button';
@@ -16,19 +19,45 @@ import Calendar from 'react-native-calendar';
 import GiftedListView from 'react-native-gifted-listview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
+import store from 'react-native-simple-store';
+import moment from 'moment';
+import _ from 'underscore';
+
+import { data } from '../data.js';
 
 export default class Main extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = PeriodStore.getState();
+    this.state.settings = data.settings;
+  }
+
+  componentDidMount() {
+    PeriodStore.listen((state) => this.onPeriodStoreChange(state));
+  }
+
+  componentWillUnmount() {
+    PeriodStore.unlisten((state) => this.onPeriodStoreChange(state));
+  }
+
+  onPeriodStoreChange(state) {
+    console.log('onPeriodStoreChange', state);
+    this.setState({
+      periods: state.periods,
+      key: Math.random(),
+    });
+  }
+
   _onFetch(page = 1, callback, options) {
-    setTimeout(() => {
-      var rows = ['row ' + ((page - 1) * 3 + 1), 'row ' + ((page - 1) * 3 + 2), 'row ' + ((page - 1) * 3 + 3)];
-      if (page === 3) {
-        callback(rows, {
-          allLoaded: true, // the end of the list is reached
-        });
-      } else {
-        callback(rows);
-      }
-    }, 1000); // simulating network fetching
+    var rows = this.state.periods.slice(4 * (page - 1), 4 * page);
+    if (4 * page > this.state.periods.length) {
+      callback(rows, {
+        allLoaded: true, // the end of the list is reached
+      });
+    } else {
+      callback(rows);
+    }
   }
 
   _renderRowView(rowData) {
@@ -39,7 +68,7 @@ export default class Main extends React.Component {
         onPress={() => Actions.editHistory(rowData)}
       >
         <View>
-          <Text>{rowData} - {rowData}</Text>
+          <Text>{moment(rowData.date).format('MMM Do, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM Do, YYYY')}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -92,24 +121,45 @@ export default class Main extends React.Component {
     }
   }
 
+  render_prediction_block() {
+    if (this.state.periods && this.state.periods.length > 0) {
+      return <View style={[styles.block, {marginTop: 10}]}>
+        <View style={styles.dayLeftheader}>
+          <Text style={styles.headerText}><Text style={{fontSize: 40}}>{'12'}</Text>{' DAYS LEFT'}</Text>
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 12'}</Text>{' Next Period'}</Text>
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 1'}</Text>{' Next Fertile'}</Text>
+        </View>
+
+        <View>
+          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => console.log()} >
+            {'Period Starts'}
+          </Button>
+          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => store.delete('periods')} >
+            {'Delete all'}
+          </Button>
+        </View>
+      </View>;
+    } else {
+      return <View style={[styles.block, {marginTop: 10}]}>
+        <View style={styles.dayLeftheader}>
+          <Text style={styles.headerText}>Please enter your period.</Text>
+        </View>
+
+        <View>
+          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => console.log()} >
+            {'Period Starts'}
+          </Button>
+        </View>
+      </View>;
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
         <ScrollView>
-          <View style={[styles.block, {marginTop: 10}]}>
-            <View style={styles.dayLeftheader}>
-              <Text style={styles.headerText}><Text style={{fontSize: 40}}>{'12'}</Text>{' DAYS LEFT'}</Text>
-              <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 12'}</Text>{' Next Period'}</Text>
-              <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 1'}</Text>{' Next Fertile'}</Text>
-            </View>
-
-            <View>
-              <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => console.log()} >
-                {'Period Starts'}
-              </Button>
-            </View>
-          </View>
+          {this.render_prediction_block()}
 
           {/*<View style={styles.block}>*/}
             <Calendar
@@ -147,11 +197,12 @@ export default class Main extends React.Component {
            <View style={styles.block}>
             <View style={styles.header}>
               <Text style={styles.headerText}>{'History'}</Text>
-              <Text style={styles.subHeaderText}>{''}</Text>
+              <Text style={styles.subHeaderHighlightText}>{'Predictions'}</Text>
             </View>
             <GiftedListView
+              key={this.state.key}
               rowView={this._renderRowView}
-              onFetch={this._onFetch}
+              onFetch={(page, callback) => this._onFetch(page, callback)}
               firstLoader={true}
               refreshable={false}
               withSections={false}
@@ -177,11 +228,15 @@ export default class Main extends React.Component {
             </View>
             <View style={styles.header}>
               <Text style={styles.subHeaderText}>Average period days</Text>
-              <Text style={styles.subHeaderHighlightText}>3 Days</Text>
+              <Text style={styles.subHeaderHighlightText}>
+                {Math.round(_.map(this.state.periods, (item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.length)} Days
+              </Text>
             </View>
             <View style={styles.header}>
               <Text style={styles.subHeaderText}>Average period cycle</Text>
-              <Text style={styles.subHeaderHighlightText}>3 Days</Text>
+              <Text style={styles.subHeaderHighlightText}>
+                {Math.round(_.map(this.state.periods, (item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.length)} Days
+              </Text>
             </View>
           </View>
         </ScrollView>
