@@ -6,7 +6,23 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
+    "apsl-react-native-button": "^2.5.0",
+    "moment": "^2.13.0",
     "react": "^15.0.2",
-    "react-native": "^0.26.1"
+    "react-native": "^0.26.1",
+    "react-native-calendar": "^0.6.4",
+    "react-native-datetime": "^0.1.2",
+    "react-native-gifted-listview": "0.0.15",
+    "react-native-navbar": "^1.5.0",
+    "react-native-router-flux": "^3.26.1",
+    "react-native-share": "^1.0.10",
+    "react-native-slider": "^0.7.1",
+    "react-native-tableview-simple": "^0.10.1",
+    "react-native-vector-icons": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.0.4",
+    "eslint": "^2.10.2",
+    "eslint-plugin-react": "^5.1.1"
   }
 }

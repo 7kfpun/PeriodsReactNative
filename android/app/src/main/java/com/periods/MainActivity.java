@@ -1,6 +1,9 @@
 package com.periods;
 
 import com.facebook.react.ReactActivity;
+import com.keyee.datetime.RCTDateTimePickerPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import cl.json.RNSharePackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 
@@ -34,7 +37,10 @@ public class MainActivity extends ReactActivity {
     @Override
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
-            new MainReactPackage()
+            new MainReactPackage(),
+            new RCTDateTimePickerPackage(),
+            new VectorIconsPackage(),
+            new RNSharePackage()
         );
     }
 }
