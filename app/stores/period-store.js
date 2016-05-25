@@ -38,6 +38,10 @@ class PeriodStore {
 
     this.isStarted = this.periods.filter((item) => item.length === undefined).length === 1;
     if (this.periods.length > 0) {
+      this.daysLeft = moment(this.periods[0].date).add(30, 'days').fromNow(true);
+      this.nextPeriod = moment(this.periods[0].date).add(30, 'days').format('MMMM Do');
+      this.nextFertile = moment(this.periods[0].date).add(30 - 14, 'days').format('MMMM Do');
+
       this.averagePeriodDays = Math.round(this.periods.map((item) => item.length).reduce((a, b) => a + b, 0) / this.periods.length);
       this.averageCycleDays = Math.round(this.periods.map((item) => item.length).reduce((a, b) => a + b, 0) / this.periods.length);
     } else {

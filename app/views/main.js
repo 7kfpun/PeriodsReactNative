@@ -15,13 +15,12 @@ import PeriodStore from '../stores/period-store';
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import Button from 'apsl-react-native-button';
-import Calendar from 'react-native-calendar';
+// import Calendar from 'react-native-calendar';
 import GiftedListView from 'react-native-gifted-listview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
 import moment from 'moment';
-import _ from 'underscore';
 
 import { data } from '../data.js';
 
@@ -46,6 +45,9 @@ export default class Main extends React.Component {
     this.setState({
       periods: state.periods,
       isStarted: state.isStarted,
+      daysLeft: state.daysLeft,
+      nextPeriod: state.nextPeriod,
+      nextFertile: state.nextFertile,
       averagePeriodDays: state.averagePeriodDays,
       averageCycleDays: state.averageCycleDays,
       key: Math.random(),
@@ -128,9 +130,9 @@ export default class Main extends React.Component {
     if (this.state.periods && this.state.periods.length > 0) {
       return <View style={[styles.block, {marginTop: 10}]}>
         <View style={styles.dayLeftheader}>
-          <Text style={styles.headerText}><Text style={{fontSize: 40}}>{'12'}</Text>{' DAYS LEFT'}</Text>
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 12'}</Text>{' Next Period'}</Text>
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{'Jun 1'}</Text>{' Next Fertile'}</Text>
+          <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' LEFT'}</Text>
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
         </View>
 
         <View>
@@ -171,7 +173,7 @@ export default class Main extends React.Component {
           {this.render_prediction_block()}
 
           {/*<View style={styles.block}>*/}
-            <Calendar
+            {/*<Calendar
               scrollEnabled={true}
               showControls={true}
               eventDates={['2015-07-03', '2015-07-05', '2015-07-10', '2015-07-15', '2015-07-20', '2015-07-25', '2015-07-28', '2015-07-30']}
@@ -200,7 +202,7 @@ export default class Main extends React.Component {
                   textAlign: 'center',
                 }
               }}
-             />
+             />*/}
            {/*</View>*/}
 
            <View style={styles.block}>
