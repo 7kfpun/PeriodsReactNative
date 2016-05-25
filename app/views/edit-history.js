@@ -7,17 +7,16 @@ import {
   View,
 } from 'react-native';
 
+// Flux
+import PeriodActions from '../actions/period-actions';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
+import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import DateTimePicker from 'react-native-datetime';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import Slider from 'react-native-slider';
-import {
-  Cell,
-  Section,
-  TableView,
-} from 'react-native-tableview-simple';
 
 import moment from 'moment';
 
@@ -26,9 +25,8 @@ export default class EditHistoryView extends React.Component {
     super(props);
 
     this.state = {
-      date: this.props.date,
-      text: '',
-      value: 3,
+      date: new Date(this.props.date),
+      length: this.props.length,
     };
     this.picker = null;
   }
@@ -42,6 +40,18 @@ export default class EditHistoryView extends React.Component {
 
   save() {
     console.log('Save');
+    PeriodActions.editPeriod({
+      uuid: this.props.uuid,
+      date: this.state.date,
+      length: this.state.length,
+    });
+    Actions.pop();
+  }
+
+  delete() {
+    PeriodActions.deletePeriod({
+      uuid: this.props.uuid,
+    });
     Actions.pop();
   }
 
@@ -83,10 +93,8 @@ export default class EditHistoryView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="PERIOD STARTS">
-              <Cell cellstyle="Basic"  onPress={()=>this.showDatePicker()}
-                title={
-                this.state.date && moment(this.state.date).format('MMM Do YY')
-              } />
+              <Cell cellstyle="Basic"  onPress={() => this.showDatePicker()}
+                title={this.state.date && moment(this.state.date).format('MMM Do YY')} />
             </Section>
 
             <Section header="BLEEDING DAYS">
@@ -97,12 +105,17 @@ export default class EditHistoryView extends React.Component {
                 minimumTrackTintColor="#31a4db"
                 thumbTouchSize={{width: 50, height: 40}}
                 value={this.state.value}
-                onValueChange={(value) => this.setState({value})}
+                onValueChange={(length) => this.setState({length})}
                 minimumValue={1}
                 maximumValue={30}
                 step={1}
               />
-              <Text>Value: {this.state.value}</Text>
+              <Text>Value: {this.state.length}</Text>
+            </Section>
+
+            <Section>
+              <Cell style={{backgroundColor: 'gray'}} cellstyle="Basic"  onPress={() => this.delete()}
+                title={"DELETE"} />
             </Section>
           </TableView>
         </ScrollView>

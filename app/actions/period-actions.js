@@ -1,15 +1,23 @@
 import alt from '../alt';
 
-// 3rd party libraries
-// import store from 'react-native-simple-store';
-
 class PeriodActions {
-  updatePeriods(periods) {
-    // store.save('periods', periods);
-    return periods;
+  addPeriod(period) {
+    return period;
   }
 
-  addPeriod(period) {
+  startPeriod(period) {
+    return period;
+  }
+
+  endPeriod(period) {
+    return period;
+  }
+
+  editPeriod(period) {
+    return period;
+  }
+
+  deletePeriod(period) {
     return period;
   }
 }

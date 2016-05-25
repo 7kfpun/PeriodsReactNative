@@ -3,12 +3,12 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 
 // Flux
 import PeriodActions from '../actions/period-actions';
+import PeriodStore from '../stores/period-store';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
@@ -20,19 +20,21 @@ import {
 import DateTimePicker from 'react-native-datetime';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-import Slider from 'react-native-slider';
 
 import moment from 'moment';
 
-export default class AddPeriodView extends React.Component {
+export default class EndPeriodView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      date: new Date(),
-      length: 3,
-    };
+    this.state = PeriodStore.getState();
+    this.state.date = new Date();
+
     this.picker = null;
+  }
+
+  componentDidMount() {
+    this.showDatePicker();
   }
 
   showDatePicker() {
@@ -48,9 +50,8 @@ export default class AddPeriodView extends React.Component {
 
   save() {
     console.log('Save');
-    PeriodActions.addPeriod({
+    PeriodActions.endPeriod({
       date: this.state.date,
-      length: this.state.length,
     });
     Actions.pop();
   }
@@ -98,22 +99,6 @@ export default class AddPeriodView extends React.Component {
                 this.state.date && moment(this.state.date).format('MMM Do YY')
               } />
             </Section>
-
-            <Section header="BLEEDING DAYS">
-              <Slider
-                style={sliderStyles.container}
-                trackStyle={sliderStyles.track}
-                thumbStyle={sliderStyles.thumb}
-                minimumTrackTintColor="#31a4db"
-                thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.length}
-                onValueChange={(length) => this.setState({length})}
-                minimumValue={1}
-                maximumValue={30}
-                step={1}
-              />
-              <Text>Value: {this.state.length}</Text>
-            </Section>
           </TableView>
         </ScrollView>
 
@@ -122,29 +107,6 @@ export default class AddPeriodView extends React.Component {
     );
   }
 }
-
-const sliderStyles = StyleSheet.create({
-  container: {
-    height: 45,
-    marginLeft: 30,
-    marginRight: 30,
-    backgroundColor: 'white',
-  },
-  track: {
-    height: 2,
-    backgroundColor: '#303030',
-  },
-  thumb: {
-    width: 10,
-    height: 10,
-    backgroundColor: '#31a4db',
-    borderRadius: 10 / 2,
-    shadowColor: '#31a4db',
-    shadowOffset: {width: 0, height: 0},
-    shadowRadius: 2,
-    shadowOpacity: 1,
-  }
-});
 
 const styles = StyleSheet.create({
   container: {

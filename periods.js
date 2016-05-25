@@ -7,6 +7,8 @@ import {
 
 import Main from './app/views/main';
 import AddPeriodView from './app/views/add-period';
+import StartPeriodView from './app/views/start-period';
+import EndPeriodView from './app/views/end-period';
 import EditHistoryView from './app/views/edit-history';
 import SettingsView from './app/views/settings';
 
@@ -25,6 +27,8 @@ const scenes = Actions.create(
   <Scene key="root" hideNavBar={true}>
     <Scene key="main" title="Period Calendar" component={Main} initial={true} />
     <Scene key="addPeriod" title="Add Period" component={AddPeriodView} />
+    <Scene key="startPeriod" title="Period Starts" component={StartPeriodView} />
+    <Scene key="endPeriod" title="Period Ends" component={EndPeriodView} />
     <Scene key="editHistory" title="Edit" component={EditHistoryView} />
     <Scene key="settings" title="Settings" component={SettingsView} />
     <Scene key="periodLengthSettings" title="Period Length" component={PeriodLengthSettingsView} />

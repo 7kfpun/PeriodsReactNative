@@ -45,6 +45,9 @@ export default class Main extends React.Component {
     console.log('onPeriodStoreChange', state);
     this.setState({
       periods: state.periods,
+      isStarted: state.isStarted,
+      averagePeriodDays: state.averagePeriodDays,
+      averageCycleDays: state.averageCycleDays,
       key: Math.random(),
     });
   }
@@ -131,8 +134,14 @@ export default class Main extends React.Component {
         </View>
 
         <View>
-          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => console.log()} >
+          {!this.state.isStarted && <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={Actions.startPeriod} >
             {'Period Starts'}
+          </Button>}
+          {this.state.isStarted && <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={Actions.endPeriod} >
+            {'Period Ends'}
+          </Button>}
+          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => store.get('periods').then((periods) => console.log(periods))} >
+            {'Print all'}
           </Button>
           <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => store.delete('periods')} >
             {'Delete all'}
@@ -146,7 +155,7 @@ export default class Main extends React.Component {
         </View>
 
         <View>
-          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => console.log()} >
+          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={Actions.startPeriod} >
             {'Period Starts'}
           </Button>
         </View>
@@ -229,13 +238,13 @@ export default class Main extends React.Component {
             <View style={styles.header}>
               <Text style={styles.subHeaderText}>Average period days</Text>
               <Text style={styles.subHeaderHighlightText}>
-                {Math.round(_.map(this.state.periods, (item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.length)} Days
+                {this.state.averagePeriodDays} Days
               </Text>
             </View>
             <View style={styles.header}>
               <Text style={styles.subHeaderText}>Average period cycle</Text>
               <Text style={styles.subHeaderHighlightText}>
-                {Math.round(_.map(this.state.periods, (item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.length)} Days
+                {this.state.averageCycleDays} Days
               </Text>
             </View>
           </View>
