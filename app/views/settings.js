@@ -91,6 +91,10 @@ export default class SettingsView extends React.Component {
               </CustomCell>*/}
             </Section>
 
+            <Section header="LINK">
+              <Cell cellstyle="Basic" title="Link" onPress={() => Actions.link()} />
+            </Section>
+
             <Section header="DEVELOPMENT">
               <Cell
                 cellstyle="Basic"

@@ -1,11 +1,15 @@
 import alt from '../alt';
 
+import Firebase from 'firebase';
+
 import PeriodActions from '../actions/period-actions';
 import { guid } from '../utils/guid';
 
 // 3rd party libraries
 import moment from 'moment';
 import store from 'react-native-simple-store';
+
+import { data } from '../data';
 
 class PeriodStore {
   constructor() {
@@ -36,12 +40,26 @@ class PeriodStore {
     });
   }
 
+  save(periods) {
+    store.save('periods', periods);
+
+    store.get('isLinkingEnabled').then((isLinkingEnabled) => {
+      if (isLinkingEnabled) {
+        store.get('uuid').then((uuid) => {
+          let firebaseRef = new Firebase(data.firebaseHost);
+          firebaseRef.child('users').child(uuid).update({periods: periods});
+          firebaseRef.off();
+        });
+      }
+    });
+  }
+
   handleAddPeriod(period) {
     console.log('handleAddPeriod', period);
     period.uuid = guid();
     this.periods.push(period);
     this.sortPeriod();
-    store.save('periods', this.periods);
+    this.save(this.periods);
   }
 
   handleStartPeriod(period) {
@@ -49,7 +67,7 @@ class PeriodStore {
     period.uuid = guid();
     this.periods.push(period);
     this.sortPeriod();
-    store.save('periods', this.periods);
+    this.save(this.periods);
   }
 
   handleEndPeriod(period) {
@@ -58,7 +76,7 @@ class PeriodStore {
     let length = moment(period.date).diff(moment(p.date), 'days');
     p.length = length;
     this.sortPeriod();
-    store.save('periods', this.periods);
+    this.save(this.periods);
   }
 
   handleEditPeriod(period) {
@@ -67,7 +85,7 @@ class PeriodStore {
     p.date = period.date;
     p.length = period.length;
     this.sortPeriod();
-    store.save('periods', this.periods);
+    this.save(this.periods);
   }
 
   handleDeletePeriod(period) {
@@ -75,7 +93,7 @@ class PeriodStore {
     let p = this.periods.filter((item) => item.uuid !== period.uuid);
     this.periods = p;
     this.sortPeriod();
-    store.save('periods', this.periods);
+    this.save(this.periods);
   }
 }
 

@@ -1,6 +1,8 @@
 package com.periods;
 
 import com.facebook.react.ReactActivity;
+import com.eguma.barcodescanner.BarcodeScanner;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.keyee.datetime.RCTDateTimePickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import cl.json.RNSharePackage;
@@ -38,6 +40,8 @@ public class MainActivity extends ReactActivity {
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
+            new BarcodeScanner(),
+            new RCTCameraPackage(),
             new RCTDateTimePickerPackage(),
             new VectorIconsPackage(),
             new RNSharePackage()
