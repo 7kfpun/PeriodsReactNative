@@ -1,16 +1,16 @@
 exports.data = {
   settings: {
-    period_length: {
-      prediction_type: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
-      value: 3,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
+    PERIOD_LENGTH: {
+      PREDICTION_TYPE: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
+      VALUE: 3,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
     },
-    cycle_length: {
-      prediction_type: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
-      value: 30,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
+    CYCLE_LENGTH: {
+      PREDICTION_TYPE: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
+      VALUE: 30,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
     },
-    ovulation_fertile: {
-      prediction_type: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
-      value: 14,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
+    OVULATION_FERTILE: {
+      PREDICTION_TYPE: 'DEFAULT',  // ['DEFAULT', 'AVERAGE']
+      VALUE: 14,  // <number> or ['LAST_1_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS']
     },
   },
   periods: [],

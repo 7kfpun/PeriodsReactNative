@@ -6,24 +6,36 @@ import {
   View,
 } from 'react-native';
 
+// Flux
+import SettingStore from '../stores/setting-store';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
+import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-import {
-  Cell,
-  Section,
-  TableView,
-} from 'react-native-tableview-simple';
+import store from 'react-native-simple-store';
 
 export default class SettingsView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      isPregnancy: false,
-      value: 0.2,
-    };
+    this.state = Object.assign({IS_PREGNANCY: false}, SettingStore.getState());
+  }
+
+  componentDidMount() {
+    SettingStore.listen((state) => this.onSettingStoreChange(state));
+  }
+
+  componentWillUnmount() {
+    SettingStore.unlisten((state) => this.onSettingStoreChange(state));
+  }
+
+  onSettingStoreChange(state) {
+    console.log('onSettingStoreChange', state);
+    this.setState({
+      settings: state.settings
+    });
   }
 
   renderToolbar() {
@@ -53,15 +65,43 @@ export default class SettingsView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="PERIOD">
-              <Cell cellstyle="RightDetail" title="Period length" detail="3 Days" onPress={() => Actions.periodLengthSettings()} />
-              <Cell cellstyle="RightDetail" title="Cycle length" detail="32 Days" onPress={() => Actions.cycleLengthSettings()} />
-              <Cell cellstyle="RightDetail" title="Ovulation and Fertile" detail="14 Days" onPress={() => Actions.ovulationFertileSettings()} />
+              <Cell
+                cellstyle="RightDetail"
+                title="Period length"
+                detail={this.state.settings.PERIOD_LENGTH.VALUE + ' Days'}
+                onPress={() => Actions.periodLengthSettings()}
+              />
+              <Cell
+                cellstyle="RightDetail"
+                title="Cycle length"
+                detail={this.state.settings.CYCLE_LENGTH.VALUE + ' Days'}
+                onPress={() => Actions.cycleLengthSettings()}
+              />
+              <Cell
+                cellstyle="RightDetail"
+                title="Ovulation and Fertile"
+                detail={this.state.settings.OVULATION_FERTILE.VALUE + ' Days'}
+                onPress={() => Actions.ovulationFertileSettings()}
+              />
               {/*<CustomCell>
                 <Text style={{flex: 1, fontSize: 16, color: 'black'}}>Pregnancy</Text>
                 <Switch
-                  onValueChange={(value) => this.setState({isPregnancy: value})}
-                  value={this.state.isPregnancy} />
+                  onValueChange={(value) => this.setState({IS_PREGNANCY: value})}
+                  value={this.state.IS_PREGNANCY} />
               </CustomCell>*/}
+            </Section>
+
+            <Section header="DEVELOPMENT">
+              <Cell
+                cellstyle="Basic"
+                title="Print all"
+                onPress={() => {store.get('periods').then((periods) => console.log(periods)); store.get('settings').then((settings) => console.log(settings));}}
+              />
+              <Cell
+                cellstyle="Basic"
+                title="Delete all"
+                onPress={() => {store.delete('periods'); store.delete('settings');}}
+              />
             </Section>
           </TableView>
         </ScrollView>

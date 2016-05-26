@@ -11,6 +11,7 @@ import {
 
 // Flux
 import PeriodStore from '../stores/period-store';
+import SettingStore from '../stores/setting-store';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
@@ -19,39 +20,78 @@ import Button from 'apsl-react-native-button';
 import GiftedListView from 'react-native-gifted-listview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-import store from 'react-native-simple-store';
 import moment from 'moment';
-
-import { data } from '../data.js';
 
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = PeriodStore.getState();
-    this.state.settings = data.settings;
+    this.state = Object.assign({}, PeriodStore.getState(), SettingStore.getState());
+    // this.state = PeriodStore.getState();
+    // this.state.settings = data.settings;
   }
 
   componentDidMount() {
     PeriodStore.listen((state) => this.onPeriodStoreChange(state));
+    SettingStore.listen((state) => this.onSettingStoreChange(state));
+
+    this.updateStatistics();
   }
 
   componentWillUnmount() {
     PeriodStore.unlisten((state) => this.onPeriodStoreChange(state));
+    SettingStore.unlisten((state) => this.onSettingStoreChange(state));
+  }
+
+  updateStatistics() {
+    if (this.state.periods.length > 0) {
+      let startedPeriod;
+      if (this.state.periods.filter((item) => item.length === undefined).length === 1) {
+        startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
+        this.setState({
+          isStarted: true,
+          daysOfPeriod: moment().diff(moment(startedPeriod.date), 'days'),
+          daysLeft: null,
+        });
+      } else {
+        this.setState({
+          isStarted: false,
+          daysOfPeriod: null,
+          daysLeft: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').diff(moment(), 'days') + 1,
+        });
+      }
+
+      this.setState({
+        nextPeriod: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').format('MMM D'),
+        nextFertile: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE - this.state.settings.OVULATION_FERTILE.VALUE, 'days').format('MMM D'),
+
+        averagePeriodDays: Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
+        averageCycleDays: 'TODO',  // Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
+      });
+
+    } else {
+      this.setState({
+        averagePeriodDays: '/',
+        averageCycleDays: '/',
+      });
+    }
   }
 
   onPeriodStoreChange(state) {
     console.log('onPeriodStoreChange', state);
     this.setState({
       periods: state.periods,
-      isStarted: state.isStarted,
-      daysLeft: state.daysLeft,
-      nextPeriod: state.nextPeriod,
-      nextFertile: state.nextFertile,
-      averagePeriodDays: state.averagePeriodDays,
-      averageCycleDays: state.averageCycleDays,
       key: Math.random(),
     });
+
+    this.updateStatistics();
+  }
+
+  onSettingStoreChange(state) {
+    console.log('onSettingStoreChange', state);
+    this.setState({settings: state.settings});
+
+    this.updateStatistics();
   }
 
   _onFetch(page = 1, callback, options) {
@@ -73,7 +113,7 @@ export default class Main extends React.Component {
         onPress={() => Actions.editHistory(rowData)}
       >
         <View>
-          <Text>{moment(rowData.date).format('MMM Do, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM Do, YYYY')}</Text>
+          <Text>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -130,7 +170,9 @@ export default class Main extends React.Component {
     if (this.state.periods && this.state.periods.length > 0) {
       return <View style={[styles.block, {marginTop: 10}]}>
         <View style={styles.dayLeftheader}>
-          <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' LEFT'}</Text>
+          {this.state.daysLeft && this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
+          {this.state.daysLeft && this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
+          {this.state.daysOfPeriod && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysOfPeriod)}</Text>{' DAY OF PERIOD'}</Text>}
           <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
           <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
         </View>
@@ -142,12 +184,6 @@ export default class Main extends React.Component {
           {this.state.isStarted && <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={Actions.endPeriod} >
             {'Period Ends'}
           </Button>}
-          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => store.get('periods').then((periods) => console.log(periods))} >
-            {'Print all'}
-          </Button>
-          <Button style={styles.buttonRight} textStyle={{fontSize: 18}} onPress={() => store.delete('periods')} >
-            {'Delete all'}
-          </Button>
         </View>
       </View>;
     } else {

@@ -104,7 +104,7 @@ export default class EditHistoryView extends React.Component {
                 thumbStyle={sliderStyles.thumb}
                 minimumTrackTintColor="#31a4db"
                 thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.value}
+                value={this.state.length}
                 onValueChange={(length) => this.setState({length})}
                 minimumValue={1}
                 maximumValue={30}

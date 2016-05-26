@@ -16,10 +16,9 @@ class PeriodStore {
       console.log('From store periods:', periods);
       if (!periods || !Array.isArray(periods)) {
         periods = [];
-        store.save('periods', []);
+        store.save('periods', periods);
       }
       that.periods = periods;
-      that.updateStatistics();
     });
 
     this.bindListeners({
@@ -31,30 +30,17 @@ class PeriodStore {
     });
   }
 
-  updateStatistics() {
+  sortPeriod() {
     this.periods.sort(function(a,b){
       return new Date(b.date) - new Date(a.date);
     });
-
-    this.isStarted = this.periods.filter((item) => item.length === undefined).length === 1;
-    if (this.periods.length > 0) {
-      this.daysLeft = moment(this.periods[0].date).add(30, 'days').fromNow(true);
-      this.nextPeriod = moment(this.periods[0].date).add(30, 'days').format('MMMM Do');
-      this.nextFertile = moment(this.periods[0].date).add(30 - 14, 'days').format('MMMM Do');
-
-      this.averagePeriodDays = Math.round(this.periods.map((item) => item.length).reduce((a, b) => a + b, 0) / this.periods.length);
-      this.averageCycleDays = Math.round(this.periods.map((item) => item.length).reduce((a, b) => a + b, 0) / this.periods.length);
-    } else {
-      this.averagePeriodDays = '/';
-      this.averageCycleDays = '/';
-    }
   }
 
   handleAddPeriod(period) {
     console.log('handleAddPeriod', period);
     period.uuid = guid();
     this.periods.push(period);
-    this.updateStatistics();
+    this.sortPeriod();
     store.save('periods', this.periods);
   }
 
@@ -62,7 +48,7 @@ class PeriodStore {
     console.log('handleStartPeriod', period);
     period.uuid = guid();
     this.periods.push(period);
-    this.updateStatistics();
+    this.sortPeriod();
     store.save('periods', this.periods);
   }
 
@@ -71,7 +57,7 @@ class PeriodStore {
     let p = this.periods.filter((item) => item.length === undefined)[0];
     let length = moment(period.date).diff(moment(p.date), 'days');
     p.length = length;
-    this.updateStatistics();
+    this.sortPeriod();
     store.save('periods', this.periods);
   }
 
@@ -80,7 +66,7 @@ class PeriodStore {
     let p = this.periods.filter((item) => item.uuid === period.uuid)[0];
     p.date = period.date;
     p.length = period.length;
-    this.updateStatistics();
+    this.sortPeriod();
     store.save('periods', this.periods);
   }
 
@@ -88,7 +74,7 @@ class PeriodStore {
     console.log('handleDeletePeriod', period);
     let p = this.periods.filter((item) => item.uuid !== period.uuid);
     this.periods = p;
-    this.updateStatistics();
+    this.sortPeriod();
     store.save('periods', this.periods);
   }
 }

@@ -7,26 +7,32 @@ import {
   View,
 } from 'react-native';
 
+// Flux
+import SettingAction from '../../actions/setting-actions';
+import SettingStore from '../../stores/setting-store';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
+import { Section, TableView } from 'react-native-tableview-simple';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-import {
-  Section,
-  TableView,
-} from 'react-native-tableview-simple';
+
+import { data } from '../../data';
 
 export default class OvulationFertileSettingsView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      text: '',
-    };
+    this.state = SettingStore.getState();
+    this.state.value = SettingStore.getState().settings.OVULATION_FERTILE.VALUE.toString();
   }
 
   save() {
     console.log('Save');
+    SettingAction.updateOvulationFertileSettings({
+      PREDICTION_TYPE: 'DEFAULT',
+      VALUE: Number(this.state.value),
+    });
     Actions.pop();
   }
 
@@ -70,10 +76,10 @@ export default class OvulationFertileSettingsView extends React.Component {
             <Section header="OVULATION AND FERTILE">
               <TextInput
                 style={styles.input}
-                onChangeText={(text) => this.setState({text})}
-                value={this.state.text}
+                onChangeText={(value) => this.setState({value})}
+                value={this.state.value}
                 keyboardType="number-pad"
-                placeholder="14 Days"
+                placeholder={data.settings.OVULATION_FERTILE.VALUE + ' Days'}
               />
             </Section>
 
