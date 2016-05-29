@@ -55,6 +55,8 @@ export default class OvulationFertileSettingsView extends React.Component {
     } else if (Platform.OS === 'android') {
       return (
         <Icon.ToolbarAndroid
+          navIconName="arrow-back"
+          onIconClicked={Actions.pop}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -73,7 +75,7 @@ export default class OvulationFertileSettingsView extends React.Component {
         {this.renderToolbar()}
         <ScrollView>
           <TableView>
-            <Section header="OVULATION AND FERTILE">
+            <Section header="OVULATION AND FERTILE" footer="Ovulation most often takes place halfway through your menstrual cycle.">
               <TextInput
                 style={styles.input}
                 onChangeText={(value) => this.setState({value})}

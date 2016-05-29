@@ -1,8 +1,11 @@
 import React from 'react';
 import {
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
+  TouchableHighlight,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -13,14 +16,14 @@ import SettingStore from '../stores/setting-store';
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import { AdMobBanner } from 'react-native-admob';
-import Button from 'apsl-react-native-button';
+import GiftedListView from 'react-native-gifted-listview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import moment from 'moment';
 
 import {config} from '../config';
 
-export default class Main extends React.Component {
+export default class CalendarView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -32,8 +35,6 @@ export default class Main extends React.Component {
   componentDidMount() {
     PeriodStore.listen((state) => this.onPeriodStoreChange(state));
     SettingStore.listen((state) => this.onSettingStoreChange(state));
-
-    this.updateStatistics();
   }
 
   componentWillUnmount() {
@@ -81,21 +82,57 @@ export default class Main extends React.Component {
       periods: state.periods,
       key: Math.random(),
     });
-
-    this.updateStatistics();
   }
 
   onSettingStoreChange(state) {
     console.log('onSettingStoreChange', state);
     this.setState({settings: state.settings});
+  }
 
-    this.updateStatistics();
+  _onFetch(page = 1, callback, options) {
+    var rows = this.state.periods.slice(4 * (page - 1), 4 * page);
+    if (4 * page > this.state.periods.length) {
+      callback(rows, {
+        allLoaded: true, // the end of the list is reached
+      });
+    } else {
+      callback(rows);
+    }
+  }
+
+  _renderRowView(rowData) {
+    return (
+      <TouchableHighlight
+        style={styles.row}
+        underlayColor="#C8C7CC"
+        onPress={() => Actions.editHistory(rowData)}
+      >
+        <View>
+          <Text>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
+        </View>
+      </TouchableHighlight>
+    );
   }
 
   onActionSelected(position) {
     if (position === 0) {  // index of 'Settings'
       Actions.settings();
     }
+  }
+
+  _renderPaginationWaitingView(paginateCallback) {
+    return (
+      <TouchableHighlight
+        underlayColor="#C8C7CC"
+        onPress={paginateCallback}
+        style={styles.paginationView}
+      >
+        <View style={{flexDirection: 'row'}}>
+          <Icon name="touch-app" size={15} color="gray"/>
+          <Text style={{fontSize: 13}}>{'Load more'}</Text>
+        </View>
+      </TouchableHighlight>
+    );
   }
 
   renderToolbar() {
@@ -124,71 +161,41 @@ export default class Main extends React.Component {
     }
   }
 
-  render_prediction_block() {
-    if (this.state.periods && this.state.periods.length > 0) {
-      return <View style={[styles.block, {flex: 2, marginTop: 10}]}>
-        <View style={styles.dayLeftheader}>
-          {this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
-          {this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
-          {this.state.daysOfPeriod === 0 && <Text style={styles.headerText}>{'FIRST DAY OF PERIOD'}</Text>}
-          {this.state.daysOfPeriod > 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>'{Math.abs(this.state.daysOfPeriod)}'</Text>{' DAY OF PERIOD'}</Text>}
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
-        </View>
-
-        <View>
-          {!this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.startPeriod} >
-            {'Period Starts'}
-          </Button>}
-          {this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.endPeriod} >
-            {'Period Ends'}
-          </Button>}
-        </View>
-      </View>;
-    } else {
-      return <View style={[styles.block, {flex: 2, marginTop: 10}]}>
-        <View style={styles.dayLeftheader}>
-          <Text style={styles.headerText}>Please enter your period.</Text>
-        </View>
-
-        <View>
-          <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.startPeriod} >
-            {'Period Starts'}
-          </Button>
-        </View>
-      </View>;
-    }
-  }
-
   render() {
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
-        <View style={{flex: 1}}>
-          {this.render_prediction_block()}
-
-          <View style={[styles.block, {flex: 1}]}>
-            <View style={[styles.header, {marginTop: 8}]}>
-              <Text style={styles.headerText}>Statistics</Text>
-              <Text style={styles.subHeaderText}>Average</Text>
-            </View>
+        <ScrollView>
+          <View style={styles.block}>
             <View style={styles.header}>
-              <Text style={styles.subHeaderText}>Average period days</Text>
-              <Text style={styles.subHeaderHighlightText}>
-                {this.state.averagePeriodDays} Days
-              </Text>
+              <Text style={styles.headerText}>{'History'}</Text>
+              <Text style={styles.subHeaderHighlightText}>{'Predictions'}</Text>
             </View>
-            <View style={[styles.header, {marginBottom: 8}]}>
-              <Text style={styles.subHeaderText}>Average period cycle</Text>
-              <Text style={styles.subHeaderHighlightText}>
-                {this.state.averageCycleDays} Days
-              </Text>
+            <GiftedListView
+              key={this.state.key}
+              rowView={this._renderRowView}
+              onFetch={(page, callback) => this._onFetch(page, callback)}
+              firstLoader={true}
+              refreshable={false}
+              withSections={false}
+
+              pagination={true}
+              paginationWaitingView={this._renderPaginationWaitingView}
+
+              refreshableTintColor="blue"
+            />
+            <View style={styles.header}>
+              <Text style={styles.headerText}>{''}</Text>
+              <TouchableOpacity
+                onPress={() => Actions.addPeriod()}>
+                <Text style={styles.subHeaderHighlightText}>{'Add period'}</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
 
-        {Platform.OS === 'android' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.android} />}
-        {Platform.OS === 'ios' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.ios} />}
+          {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
+          {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+        </ScrollView>
       </View>
     );
   }
@@ -220,8 +227,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF5350',
   },
   block: {
-    flex: 1,
-    justifyContent: 'space-around',
     backgroundColor: 'white',
     marginTop: 5,
     marginBottom: 5,
@@ -242,6 +247,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 10,
     marginLeft: 10,
     marginRight: 10,
   },
@@ -257,13 +264,39 @@ const styles = StyleSheet.create({
     color: '#EF5350',
     fontSize: 16,
   },
-  button: {
+  row: {
+    height: 50,
+    padding: 10,
+    justifyContent: 'center',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E0E0E0',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E0E0E0',
+    backgroundColor: 'white',
+  },
+  buttonLeft: {
     flex: 1,
-    marginLeft: 15,
-    marginRight: 15,
-    marginBottom: 10,
-    borderColor: 'white',
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
+    marginLeft: 10,
+    marginRight: 5,
+    borderColor: '#4DB6AC',
+    backgroundColor: 'white',
+    borderRadius: 0,
+    borderWidth: 3,
+  },
+  buttonRight: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 20,
+    borderColor: '#FFB74D',
+    backgroundColor: 'white',
+    borderRadius: 0,
+    borderWidth: 3,
+  },
+  paginationView: {
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
 });

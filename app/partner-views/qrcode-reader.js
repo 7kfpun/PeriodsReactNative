@@ -27,6 +27,12 @@ export default class QRCodeReaderView extends React.Component {
 
   }
 
+  onActionSelected(position) {
+    if (position === 0) {  // index of 'Settings'
+      Actions.selectGender();
+    }
+  }
+
   renderToolbar() {
     if (Platform.OS === 'ios') {
       return (
@@ -43,7 +49,7 @@ export default class QRCodeReaderView extends React.Component {
           title={this.props.title}
           titleColor="white"
           actions={[
-            {title: 'Settings', iconName: 'close', iconSize: 26, show: 'always'},
+            {title: 'Close', iconName: 'close', iconSize: 26, show: 'always'},
           ]}
           onActionSelected={(position) => this.onActionSelected(position)}
         />

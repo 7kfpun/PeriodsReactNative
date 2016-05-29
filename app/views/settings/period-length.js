@@ -55,6 +55,8 @@ export default class PeriodLengthSettingsView extends React.Component {
     } else if (Platform.OS === 'android') {
       return (
         <Icon.ToolbarAndroid
+          navIconName="arrow-back"
+          onIconClicked={Actions.pop}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -73,7 +75,7 @@ export default class PeriodLengthSettingsView extends React.Component {
         {this.renderToolbar()}
         <ScrollView>
           <TableView>
-            <Section header="PERIOD LENGTH">
+            <Section header="PERIOD LENGTH" footer="Most menstrual periods last from 3 to 5 days.">
               <TextInput
                 style={styles.input}
                 onChangeText={(value) => this.setState({value})}

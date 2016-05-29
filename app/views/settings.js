@@ -44,12 +44,14 @@ export default class SettingsView extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={() => Actions.pop()} />}
+          leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={Actions.pop} />}
         />
       );
     } else if (Platform.OS === 'android') {
       return (
         <Icon.ToolbarAndroid
+          navIconName="arrow-back"
+          onIconClicked={Actions.pop}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -92,7 +94,7 @@ export default class SettingsView extends React.Component {
             </Section>
 
             <Section header="LINK">
-              <Cell cellstyle="Basic" title="Link" onPress={() => Actions.link()} />
+              <Cell cellstyle="Basic" title="Linking Accounts" onPress={Actions.link} />
             </Section>
 
             <Section header="DEVELOPMENT">

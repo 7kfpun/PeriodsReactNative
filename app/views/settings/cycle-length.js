@@ -55,6 +55,8 @@ export default class CycleLengthSettingsView extends React.Component {
     } else if (Platform.OS === 'android') {
       return (
         <Icon.ToolbarAndroid
+          navIconName="arrow-back"
+          onIconClicked={Actions.pop}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -73,7 +75,7 @@ export default class CycleLengthSettingsView extends React.Component {
         {this.renderToolbar()}
         <ScrollView>
           <TableView>
-            <Section header="CYCLE LENGTH">
+            <Section header="CYCLE LENGTH" footer="Count the number of days from whenyour period starts to the day before the next one begins.">
               <TextInput
                 style={styles.input}
                 onChangeText={(value) => this.setState({value})}
