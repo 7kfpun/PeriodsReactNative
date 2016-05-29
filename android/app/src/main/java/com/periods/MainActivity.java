@@ -1,6 +1,7 @@
 package com.periods;
 
 import com.facebook.react.ReactActivity;
+import com.sbugert.rnadmob.RNAdMobPackage;
 import com.eguma.barcodescanner.BarcodeScanner;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.keyee.datetime.RCTDateTimePickerPackage;
@@ -40,6 +41,7 @@ public class MainActivity extends ReactActivity {
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
+            new RNAdMobPackage(),
             new BarcodeScanner(),
             new RCTCameraPackage(),
             new RCTDateTimePickerPackage(),
