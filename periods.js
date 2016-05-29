@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Text,
   View,
 } from 'react-native';
 import {
@@ -12,6 +11,7 @@ import {
 
 // 3rd party libraries
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import store from 'react-native-simple-store';
 
 import SelectGenderView from './app/views/select-gender';
 
@@ -55,7 +55,7 @@ class TabIcon extends React.Component {
 
 const scenes = Actions.create(
   <Scene key="root" hideNavBar={true}>
-    <Scene key="selectGender" title="Select your gender" component={SelectGenderView} initial={true}  type="reset" />
+    <Scene key="selectGender" title="Select your gender" component={SelectGenderView} initial={true} type="reset" />
 
     <Scene key="main" component={NavigationDrawer} type="reset">
       <Scene key="tabbar" tabs={true}>
@@ -83,6 +83,16 @@ const scenes = Actions.create(
 );
 
 export default class Periods extends React.Component {
+  componentDidMount() {
+    store.get('gender').then((gender) => {
+      if (gender === 'female') {
+        Actions.main();
+      } else if (gender === 'male') {
+        Actions.qrcodeReader();
+      }
+    });
+  }
+
   render() {
     return <Router scenes={scenes}/>;
   }

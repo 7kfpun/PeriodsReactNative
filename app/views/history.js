@@ -109,6 +109,7 @@ export default class CalendarView extends React.Component {
       >
         <View>
           <Text>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
+          <Text>Length: {rowData.length}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -141,9 +142,7 @@ export default class CalendarView extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={() => {
-            Actions.settings();
-          }} />}
+          rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={Actions.settings} />}
         />
       );
     } else if (Platform.OS === 'android') {

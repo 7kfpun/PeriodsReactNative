@@ -27,9 +27,8 @@ import moment from 'moment';
 export default class AddPeriodView extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      date: new Date(),
+      date: this.props.date || new Date(),
       length: 3,
     };
     this.picker = null;
@@ -95,10 +94,10 @@ export default class AddPeriodView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="PERIOD STARTS">
-              <Cell cellstyle="Basic"  onPress={()=>this.showDatePicker()}
-                title={
-                this.state.date && moment(this.state.date).format('MMM Do YY')
-              } />
+              <Cell cellstyle="Basic"
+                onPress={()=>this.showDatePicker()}
+                title={this.state.date && moment(this.state.date).format('MMM Do YY')}
+              />
             </Section>
 
             <Section header="BLEEDING DAYS">

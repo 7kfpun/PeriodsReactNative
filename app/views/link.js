@@ -27,7 +27,7 @@ const WIDTH = Dimensions.get('window').width;
 
 import { guid } from '../utils/guid';
 
-import { data } from '../data';
+import { config } from '../config';
 
 export default class LinkView extends React.Component {
   constructor(props) {
@@ -41,18 +41,16 @@ export default class LinkView extends React.Component {
   }
 
   componentWillMount() {
-    this.firebaseRef = new Firebase(data.firebaseHost);
+    this.firebaseRef = new Firebase(config.firebaseHost);
   }
 
   componentDidMount() {
     let that = this;
     store.get('isLinkingEnabled').then((isLinkingEnabled) => {
       store.get('uuid').then((uuid) => {
-        that.setState({
-          isLinkingEnabled: isLinkingEnabled,
-          uuid: uuid,
-        });
         if (isLinkingEnabled) {
+          that.setState({isLinkingEnabled: true});
+
           that.firebaseRef.child('users').child(uuid).child('linkedAccounts').on('value', (snapshot) => {
             console.log('linkedAccounts', snapshot.val());
             that.setState({

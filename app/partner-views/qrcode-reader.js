@@ -13,6 +13,7 @@ import BarcodeScanner from 'react-native-barcode-scanner-universal';
 import Button from 'apsl-react-native-button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
+import store from 'react-native-simple-store';
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -30,6 +31,7 @@ export default class QRCodeReaderView extends React.Component {
   onActionSelected(position) {
     if (position === 0) {  // index of 'Settings'
       Actions.selectGender();
+      store.delete('gender');
     }
   }
 
@@ -39,7 +41,7 @@ export default class QRCodeReaderView extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          rightButton={<Icon style={styles.navigatorRightButton} name="close" size={26} color="white" onPress={Actions.selectGender} />}
+          rightButton={<Icon style={styles.navigatorRightButton} name="close" size={26} color="white" onPress={() => {Actions.selectGender(); store.delete('gender');}} />}
         />
       );
     } else if (Platform.OS === 'android') {

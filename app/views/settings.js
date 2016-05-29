@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AsyncStorage,
   Platform,
   ScrollView,
   StyleSheet,
@@ -107,6 +108,11 @@ export default class SettingsView extends React.Component {
                 cellstyle="Basic"
                 title="Delete all"
                 onPress={() => {store.delete('periods'); store.delete('settings');}}
+              />
+              <Cell
+                cellstyle="Basic"
+                title="Clear all"
+                onPress={() => {AsyncStorage.clear(); Actions.selectGender();}}
               />
             </Section>
           </TableView>

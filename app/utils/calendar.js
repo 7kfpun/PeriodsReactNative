@@ -46,7 +46,7 @@ class MonthBodyCell extends React.Component {
         ]
 
         return (
-            <TouchableOpacity style={styles.monthBodyCell} activeOpacity={1} onPress={!dayInfo.disabled && onPress ? () => onPress(dayInfo) : null}>
+            <TouchableOpacity style={styles.monthBodyCell} activeOpacity={1} onPress={dayInfo.disabled && onPress ? () => onPress(dayInfo) : null}>
                 <View style={cellDateStyle}>
                     <Text style={cellDateTextStyle}>
                         {dayInfo.holiday ? dayInfo.holiday : dayInfo.dateText}
@@ -150,7 +150,7 @@ class Calendar extends React.Component {
         while(endTime.isSameOrAfter(startTime, 'day')){
             const year = startTime.year(),
                 month = startTime.month(),
-                date = year + '年' + (month + 1) + '月'
+                date = moment(startTime).format('MMM YYYY')  // year + '年' + (month + 1) + '月'
 
             months[date] = {
                 date: year + "," + month
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
 
     // month header
     monthHeader: {
-        height: 40,
+        height: 30,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     monthHeaderText: {
-        fontSize: 18,
+        fontSize: 12,
     },
 
     // month body
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     // month body cell
     monthBodyCell: {
         width: DateCellSize,
-        height: DateCellSize + 15,
+        height: DateCellSize + 2,
         marginTop: 10,
         alignItems: 'center',
     },
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     monthBodyCellNoteText: {
-        color: '#1ba9ba',
+        color: 'gray',
         fontSize: 12,
     },
     activeMonthBodyCellDate: {

@@ -9,6 +9,7 @@ import {
 // Flux
 import PeriodActions from '../actions/period-actions';
 import PeriodStore from '../stores/period-store';
+import SettingStore from '../stores/setting-store';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
@@ -27,7 +28,7 @@ export default class EndPeriodView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = PeriodStore.getState();
+    this.state = Object.assign({}, PeriodStore.getState(), SettingStore.getState());
     this.state.date = new Date();
 
     this.picker = null;
@@ -38,7 +39,8 @@ export default class EndPeriodView extends React.Component {
   }
 
   showDatePicker() {
-    var date = this.state.date;
+    console.log(this.props);
+    var date = new Date(moment(this.props.date).add(this.state.settings.PERIOD_LENGTH.VALUE, 'days')) || this.state.date;
     this.picker.showDatePicker(date, (d) => {
       if (moment().diff(d) < 0) {
         this.setState({date: new Date()});
@@ -95,11 +97,11 @@ export default class EndPeriodView extends React.Component {
         {this.renderToolbar()}
         <ScrollView>
           <TableView>
-            <Section header="PERIOD STARTS">
-              <Cell cellstyle="Basic"  onPress={()=>this.showDatePicker()}
-                title={
-                this.state.date && moment(this.state.date).format('MMM Do YY')
-              } />
+            <Section header="PERIOD ENDS">
+              <Cell cellstyle="Basic"
+                onPress={()=>this.showDatePicker()}
+                title={this.props.date && moment(this.props.date).add(this.state.settings.PERIOD_LENGTH.VALUE, 'days').format('MMM Do YY') || this.state.date && moment(this.state.date).format('MMM Do YY')}
+              />
             </Section>
           </TableView>
         </ScrollView>

@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import moment from 'moment';
 
+import {getOrdinal} from '../utils/get-ordinal';
 import {config} from '../config';
 
 export default class Main extends React.Component {
@@ -25,8 +26,6 @@ export default class Main extends React.Component {
     super(props);
 
     this.state = Object.assign({}, PeriodStore.getState(), SettingStore.getState());
-    // this.state = PeriodStore.getState();
-    // this.state.settings = data.settings;
   }
 
   componentDidMount() {
@@ -48,24 +47,33 @@ export default class Main extends React.Component {
         startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
         this.setState({
           isStarted: true,
+          startedPeriod: startedPeriod,
           daysOfPeriod: moment().diff(moment(startedPeriod.date), 'days'),
           daysLeft: null,
         });
       } else {
         this.setState({
           isStarted: false,
+          startedPeriod: null,
           daysOfPeriod: null,
           daysLeft: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').diff(moment(), 'days') + 1,
         });
       }
 
+      let cycleDiffs = [];
+      for (let i = 0; i < this.state.periods.length - 1; i++) {
+        cycleDiffs.push(moment(this.state.periods[i].date).diff(this.state.periods[i + 1].date, 'days'));
+      }
+      console.log('cycleDiffs', cycleDiffs);
+
       this.setState({
         nextPeriod: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').format('MMM D'),
-        nextFertile: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE - this.state.settings.OVULATION_FERTILE.VALUE, 'days').format('MMM D'),
+        nextFertile: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE - this.state.settings.OVULATION_FERTILE.VALUE - 5, 'days').format('MMM D'),
 
         averagePeriodDays: Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
-        averageCycleDays: 'TODO',  // Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
+        averageCycleDays: Math.round(cycleDiffs.reduce((a, b) => a + b, 0) / cycleDiffs.length),
       });
+
 
     } else {
       this.setState({
@@ -104,9 +112,7 @@ export default class Main extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={() => {
-            Actions.settings();
-          }} />}
+          rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={Actions.settings} />}
         />
       );
     } else if (Platform.OS === 'android') {
@@ -128,10 +134,9 @@ export default class Main extends React.Component {
     if (this.state.periods && this.state.periods.length > 0) {
       return <View style={[styles.block, {flex: 2, marginTop: 10}]}>
         <View style={styles.dayLeftheader}>
-          {this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
-          {this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
-          {this.state.daysOfPeriod === 0 && <Text style={styles.headerText}>{'FIRST DAY OF PERIOD'}</Text>}
-          {this.state.daysOfPeriod > 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>'{Math.abs(this.state.daysOfPeriod)}'</Text>{' DAY OF PERIOD'}</Text>}
+          {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
+          {this.state.daysLeft !== null &&  this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
+          {this.state.daysOfPeriod !== null && this.state.daysOfPeriod !== 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{getOrdinal(this.state.daysOfPeriod + 1)}</Text>{' DAY OF PERIOD'}</Text>}
           <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
           <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
         </View>
@@ -140,7 +145,7 @@ export default class Main extends React.Component {
           {!this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.startPeriod} >
             {'Period Starts'}
           </Button>}
-          {this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.endPeriod} >
+          {this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={() => Actions.endPeriod({date: this.state.startedPeriod.date})} >
             {'Period Ends'}
           </Button>}
         </View>
@@ -233,7 +238,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CCCCCC',
   },
   dayLeftheader: {
-    marginTop: 30,
+    marginTop: 15,
     marginBottom: 10,
     marginLeft: 10,
     marginRight: 10,

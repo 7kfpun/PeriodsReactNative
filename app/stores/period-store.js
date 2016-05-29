@@ -9,6 +9,7 @@ import { guid } from '../utils/guid';
 import moment from 'moment';
 import store from 'react-native-simple-store';
 
+import { config } from '../config';
 import { data } from '../data';
 
 class PeriodStore {
@@ -46,7 +47,7 @@ class PeriodStore {
     store.get('isLinkingEnabled').then((isLinkingEnabled) => {
       if (isLinkingEnabled) {
         store.get('uuid').then((uuid) => {
-          let firebaseRef = new Firebase(data.firebaseHost);
+          let firebaseRef = new Firebase(config.firebaseHost);
           firebaseRef.child('users').child(uuid).update({periods: periods});
           firebaseRef.off();
         });

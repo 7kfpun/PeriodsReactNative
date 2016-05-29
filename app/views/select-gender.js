@@ -10,6 +10,7 @@ import {
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import store from 'react-native-simple-store';
 
 StatusBar.setHidden(true);
 
@@ -18,16 +19,28 @@ export default class SelectGenderView extends React.Component {
     super(props);
   }
 
+  selectFemale() {
+    Actions.main();
+    StatusBar.setHidden(false);
+    store.save('gender', 'female');
+  }
+
+  selectMale() {
+    Actions.qrcodeReader()
+    StatusBar.setHidden(false);
+    store.save('gender', 'male');
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <TouchableHighlight style={{flex: 1}} onPress={() => {Actions.main(); StatusBar.setHidden(false);}}>
+        <TouchableHighlight style={{flex: 1}} onPress={() => this.selectFemale()}>
           <View style={styles.leftContainer}>
             <FontAwesomeIcon name="female" size={40} color="white"  />
             <Text style={styles.text}>Female</Text>
           </View>
         </TouchableHighlight>
-        <TouchableHighlight style={{flex: 1}} onPress={() => {Actions.qrcodeReader(); StatusBar.setHidden(false);}}>
+        <TouchableHighlight style={{flex: 1}} onPress={() => this.selectMale()}>
           <View style={styles.rightContainer}>
             <FontAwesomeIcon name="male" size={40} color="white" />
             <Text style={styles.text}>Male</Text>

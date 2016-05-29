@@ -95,8 +95,10 @@ export default class EditHistoryView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="PERIOD STARTS">
-              <Cell cellstyle="Basic"  onPress={() => this.showDatePicker()}
-                title={this.state.date && moment(this.state.date).format('MMM Do YY')} />
+              <Cell cellstyle="Basic"
+                onPress={() => this.showDatePicker()}
+                title={this.state.date && moment(this.state.date).format('MMM Do YY')}
+              />
             </Section>
 
             <Section header="BLEEDING DAYS">
