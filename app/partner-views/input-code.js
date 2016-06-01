@@ -6,11 +6,17 @@ import {
   View,
 } from 'react-native';
 
+import Firebase from 'firebase';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import Button from 'apsl-react-native-button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
+import Toast from 'react-native-root-toast';
+import store from 'react-native-simple-store';
+
+import { config } from '../config';
 
 export default class QRCodeReaderView extends React.Component {
   constructor(props) {
@@ -19,8 +25,35 @@ export default class QRCodeReaderView extends React.Component {
     this.state = {};
   }
 
-  connect() {
+  componentWillMount() {
+    this.firebaseRef = new Firebase(config.firebaseHost);
+  }
 
+  componentWillUnmount() {
+    this.firebaseRef.off();
+  }
+
+  connect() {
+    this.state.value;
+    // let that = this;
+    this.firebaseRef.child('users').child(this.state.value).on('value', (snapshot) => {
+      console.log('check', snapshot.val());
+      let values = snapshot.val();
+      if (values !== null) {
+        store.save('gender', 'male');
+        store.save('uuid', this.state.value);
+
+        Toast.show('Nice! You have linked the calendar with your partnar.', {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+          onHidden: Actions.mainMale,
+        });
+      }
+    });
   }
 
   onActionSelected(position) {
@@ -67,7 +100,7 @@ export default class QRCodeReaderView extends React.Component {
               placeholder={'Or input the CODE here'}
               placeholderTextColor="#9E9E9E"
             />
-            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => console.log()} >
+            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => this.connect()} >
               {'Connect'}
             </Button>
           </View>
