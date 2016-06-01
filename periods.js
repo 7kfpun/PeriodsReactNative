@@ -33,7 +33,9 @@ import LinkView from './app/views/link';
 
 import QRCodeReaderView from './app/partner-views/qrcode-reader';
 import InputCodeView from './app/partner-views/input-code';
-// import QRCodeReaderView from './app/partner-views/test';
+import MainMaleView from './app/partner-views/main';
+import HistoryMaleView from './app/partner-views/history';
+import SettingsMaleView from './app/partner-views/settings';
 
 // @todo remove when RN upstream is fixed
 console.ignoredYellowBox = [
@@ -46,7 +48,18 @@ class TabIcon extends React.Component {
   render() {
     return (
       <View style={{paddingTop: 100, justifyContent: 'center', alignItems: 'center'}}>
-        <Icon style={{color: this.props.selected ? 'red' : 'black'}} name={this.props.tabIcon} size={24} />
+        <Icon style={{color: this.props.selected ? '#EF5350' : '#616161'}} name={this.props.tabIcon} size={24} />
+        {/*<Text style={{fontSize: 10, margin: 0, color: this.props.selected ? 'red' : 'black'}}>{this.props.tabName}</Text>*/}
+      </View>
+    );
+  }
+}
+
+class TabIconMale extends React.Component {
+  render() {
+    return (
+      <View style={{paddingTop: 100, justifyContent: 'center', alignItems: 'center'}}>
+        <Icon style={{color: this.props.selected ? '#5C6BC0' : '#616161'}} name={this.props.tabIcon} size={24} />
         {/*<Text style={{fontSize: 10, margin: 0, color: this.props.selected ? 'red' : 'black'}}>{this.props.tabName}</Text>*/}
       </View>
     );
@@ -79,6 +92,14 @@ const scenes = Actions.create(
 
     <Scene key="qrcodeReader" title="QR Code Reader" component={QRCodeReaderView}  type="reset" />
     <Scene key="inputCode" title="Input code" component={InputCodeView} />
+
+    <Scene key="mainMale" component={NavigationDrawer} type="reset">
+      <Scene key="tabbarMale" tabs={true}>
+        <Scene key="homeMale" title="Period Calendar" tabIcon="home" tabName="Home" component={MainMaleView} hideNavBar={true} icon={TabIconMale} />
+        <Scene key="historyMale" title="History" tabIcon="history" tabName="History" component={HistoryMaleView} hideNavBar={true} icon={TabIconMale} />
+        <Scene key="settingsMale" title="Settings" tabIcon="settings" tabName="Settings" component={SettingsMaleView} hideNavBar={true} icon={TabIconMale} />
+      </Scene>
+    </Scene>
   </Scene>
 );
 
@@ -88,7 +109,7 @@ export default class Periods extends React.Component {
       if (gender === 'female') {
         Actions.main();
       } else if (gender === 'male') {
-        Actions.qrcodeReader();
+        Actions.mainMale();
       }
     });
   }
