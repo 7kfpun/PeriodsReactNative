@@ -46,7 +46,10 @@ export default class CalendarView extends React.Component {
 
   onSettingStoreChange(state) {
     console.log('onSettingStoreChange', state);
-    this.setState({settings: state.settings});
+    this.setState({
+      settings: state.settings,
+      key: Math.random(),
+    });
   }
 
   renderToolbar() {
@@ -143,7 +146,11 @@ export default class CalendarView extends React.Component {
 
       for (var i = 0; i < 12; i++) {
         for (var j = 0; j < this.state.settings.PERIOD_LENGTH.VALUE; j++) {
-          active[moment(latestPeriod.date).add(this.state.settings.CYCLE_LENGTH.VALUE * i + j, 'days').format('YYYY-MM-DD')] = 'blooding';
+          if (i === 0) {
+
+          } else {
+            active[moment(latestPeriod.date).add(this.state.settings.CYCLE_LENGTH.VALUE * i + j, 'days').format('YYYY-MM-DD')] = 'blooding';
+          }
         }
 
         active[moment(latestPeriod.date).add(this.state.settings.CYCLE_LENGTH.VALUE * i - this.state.settings.OVULATION_FERTILE.VALUE, 'days').format('YYYY-MM-DD')] = 'fill';
