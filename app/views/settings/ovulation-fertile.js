@@ -3,7 +3,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
+  Text,
   View,
 } from 'react-native';
 
@@ -16,22 +16,21 @@ import { Actions } from 'react-native-router-flux';
 import { Section, TableView } from 'react-native-tableview-simple';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-
-import { data } from '../../data';
+import Slider from 'react-native-slider';
 
 export default class OvulationFertileSettingsView extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = SettingStore.getState();
-    this.state.value = SettingStore.getState().settings.OVULATION_FERTILE.VALUE.toString();
+    this.state.value = SettingStore.getState().settings.OVULATION_FERTILE.VALUE;
   }
 
   save() {
     console.log('Save');
     SettingAction.updateOvulationFertileSettings({
       PREDICTION_TYPE: 'DEFAULT',
-      VALUE: Number(this.state.value),
+      VALUE: this.state.value,
     });
     Actions.pop();
   }
@@ -76,13 +75,19 @@ export default class OvulationFertileSettingsView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="OVULATION AND FERTILE" footer="Ovulation most often takes place halfway through your menstrual cycle.">
-              <TextInput
-                style={styles.input}
-                onChangeText={(value) => this.setState({value})}
+              <Slider
+                style={sliderStyles.container}
+                trackStyle={sliderStyles.track}
+                thumbStyle={sliderStyles.thumb}
+                minimumTrackTintColor="#31a4db"
+                thumbTouchSize={{width: 50, height: 40}}
                 value={this.state.value}
-                keyboardType="number-pad"
-                placeholder={data.settings.OVULATION_FERTILE.VALUE + ' Days'}
+                onValueChange={(value) => this.setState({value})}
+                minimumValue={1}
+                maximumValue={30}
+                step={1}
               />
+              <Text>Value: {this.state.value}</Text>
             </Section>
 
           </TableView>
@@ -92,6 +97,29 @@ export default class OvulationFertileSettingsView extends React.Component {
     );
   }
 }
+
+const sliderStyles = StyleSheet.create({
+  container: {
+    height: 45,
+    marginLeft: 30,
+    marginRight: 30,
+    backgroundColor: 'white',
+  },
+  track: {
+    height: 2,
+    backgroundColor: '#303030',
+  },
+  thumb: {
+    width: 10,
+    height: 10,
+    backgroundColor: '#31a4db',
+    borderRadius: 10 / 2,
+    shadowColor: '#31a4db',
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 2,
+    shadowOpacity: 1,
+  }
+});
 
 const styles = StyleSheet.create({
   container: {
