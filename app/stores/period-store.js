@@ -10,7 +10,6 @@ import moment from 'moment';
 import store from 'react-native-simple-store';
 
 import { config } from '../config';
-import { data } from '../data';
 
 class PeriodStore {
   constructor() {

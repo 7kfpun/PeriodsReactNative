@@ -1,10 +1,13 @@
 import alt from '../alt';
 
+import Firebase from 'firebase';
+
 import SettingActions from '../actions/setting-actions';
 
 // 3rd party libraries
 import store from 'react-native-simple-store';
 
+import { config } from '../config';
 import { data } from '../data';
 
 class SettingStore {
@@ -29,12 +32,26 @@ class SettingStore {
     });
   }
 
+  save(settings) {
+    store.save('settings', settings);
+
+    store.get('isLinkingEnabled').then((isLinkingEnabled) => {
+      if (isLinkingEnabled) {
+        store.get('uuid').then((uuid) => {
+          let firebaseRef = new Firebase(config.firebaseHost);
+          firebaseRef.child('users').child(uuid).update({settings: settings});
+          firebaseRef.off();
+        });
+      }
+    });
+  }
+
   handleUpdatePeriodLengthSettings(periodLengthSettings) {
     if (isNaN(periodLengthSettings.VALUE)) {
       this.settings.PERIOD_LENGTH = data.settings.PERIOD_LENGTH;
     }
     this.settings.PERIOD_LENGTH = periodLengthSettings;
-    store.save('settings', this.settings);
+    this.save(this.settings);
   }
 
   handleUpdateCycleLengthSettings(cycleLengthSettings) {
@@ -42,7 +59,7 @@ class SettingStore {
       this.settings.CYCLE_LENGTH = data.settings.CYCLE_LENGTH;
     }
     this.settings.CYCLE_LENGTH = cycleLengthSettings;
-    store.save('settings', this.settings);
+    this.save(this.settings);
   }
 
   handleUpdateOvulationFertileSettings(ovulationFertileSettings) {
@@ -50,7 +67,7 @@ class SettingStore {
       this.settings.OVULATION_FERTILE = data.settings.OVULATION_FERTILE;
     }
     this.settings.OVULATION_FERTILE = ovulationFertileSettings;
-    store.save('settings', this.settings);
+    this.save(this.settings);
   }
 }
 
