@@ -75,19 +75,21 @@ export default class OvulationFertileSettingsView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="OVULATION AND FERTILE" footer="Ovulation most often takes place halfway through your menstrual cycle.">
-              <Slider
-                style={sliderStyles.container}
-                trackStyle={sliderStyles.track}
-                thumbStyle={sliderStyles.thumb}
-                minimumTrackTintColor="#31a4db"
-                thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.value}
-                onValueChange={(value) => this.setState({value})}
-                minimumValue={1}
-                maximumValue={30}
-                step={1}
-              />
-              <Text>Value: {this.state.value}</Text>
+              <View style={{backgroundColor: 'white'}}>
+                <Slider
+                  style={sliderStyles.container}
+                  trackStyle={sliderStyles.track}
+                  thumbStyle={sliderStyles.thumb}
+                  minimumTrackTintColor="#31a4db"
+                  thumbTouchSize={{width: 50, height: 40}}
+                  value={this.state.value}
+                  onValueChange={(value) => this.setState({value})}
+                  minimumValue={1}
+                  maximumValue={30}
+                  step={1}
+                />
+              </View>
+              <Text style={{marginLeft: 20}}>Value: {this.state.value}</Text>
             </Section>
 
           </TableView>
@@ -101,8 +103,8 @@ export default class OvulationFertileSettingsView extends React.Component {
 const sliderStyles = StyleSheet.create({
   container: {
     height: 45,
-    marginLeft: 30,
-    marginRight: 30,
+    marginLeft: 20,
+    marginRight: 20,
     backgroundColor: 'white',
   },
   track: {

@@ -1,19 +1,28 @@
 import React from 'react';
 import {
+  Alert,
+  Dimensions,
   Platform,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import Dimensions from 'Dimensions';
+
+import Firebase from 'firebase';
+import moment from 'moment';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import BarcodeScanner from 'react-native-barcode-scanner-universal';
 import Button from 'apsl-react-native-button';
+import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
+// import Toast from 'react-native-root-toast';
+
+import { config } from '../config';
+import { guid } from '../utils/guid';
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -21,11 +30,71 @@ export default class QRCodeReaderView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      isLoading: false,
+      cameraAvailable: false,
+    };
+    // this.state = {cameraAvailable: true};
   }
 
-  connect() {
+  componentWillMount() {
+    this.firebaseRef = new Firebase(config.firebaseHost);
+  }
 
+  componentWillUnmount() {
+    this.firebaseRef.off();
+  }
+
+  checkCamera() {
+    Camera.checkDeviceAuthorizationStatus().then(isAuthorized => {
+      console.log(isAuthorized);
+      if (isAuthorized) {
+        this.setState({cameraAvailable: true});
+      } else {
+        Alert.alert(
+          'Camera Access Denied',
+          'Go to Settings / Privacy / Camera and enable access for this app',
+          [
+            {text: 'OK', onPress:() => console.log()},
+          ]
+        );
+      }
+    }).catch(err => console.error(err));
+  }
+
+  connect(linkingToken) {
+    if (!this.state.isLoading) {
+      this.setState({isLoading: true});
+
+      console.log(linkingToken);
+      var that = this;
+      console.log('linkingToken', linkingToken);
+      this.firebaseRef.child('users').orderByChild('linkingToken/token').equalTo(linkingToken).once('value', function(snapshot) {
+        if (snapshot.val()) {
+          var keys = Object.keys(snapshot.val());
+          if (keys.length > 0) {
+            var uuid = guid();
+            store.save('uuid', uuid);
+            store.save('gender', 'male');
+            var partnerUuid = keys[0];
+            console.log('partnerUuid', partnerUuid);
+            store.save('partnerUuid', partnerUuid);
+            that.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).set({
+              uuid: uuid,
+              gender: 'male',
+              linkedDate: moment().format(),
+            });
+
+            Actions.mainMale();
+            // Toast.show('Nice! You have linked the calendar with your partnar.', {
+            //   duration: Toast.durations.SHORT,
+            //   position: Toast.positions.BOTTOM,
+            //   onHidden: Actions.mainMale,
+            // });
+          }
+        }
+      });
+    }
   }
 
   onActionSelected(position) {
@@ -69,6 +138,10 @@ export default class QRCodeReaderView extends React.Component {
       );
     }
 
+    if (!this.state.cameraAvailable) {
+      this.checkCamera();
+    }
+
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
@@ -78,11 +151,19 @@ export default class QRCodeReaderView extends React.Component {
           </View>
 
           <View style={styles.block}>
-            <BarcodeScanner
-              onBarCodeRead={(code) => {console.log(code); this.setState({code: code});}}
+            {!this.state.cameraAvailable && <Icon name="refresh" size={32} color="gray" onPress={() => this.checkCamera()} />}
+            {this.state.cameraAvailable && <BarcodeScanner
+              onBarCodeRead={(code) => {
+                this.setState({code: code});
+                if (code && code.type === 'org.iso.QRCode') {
+                  this.connect(code.data);
+                  // Actions.inputCode({value: code.data});
+                }
+              }}
+              captureAudio={false}
               style={styles.camera}>
               {scanArea}
-            </BarcodeScanner>
+            </BarcodeScanner>}
           </View>
 
           <View style={styles.block}>

@@ -84,7 +84,7 @@ export default class CalendarView extends React.Component {
       'Add on ' + moment(d.date).format('MMM D, YYYY'),
       '',
       [
-        {text: 'Add period', onPress: () => Actions.addPeriod({date: d.date, type: 'PERIOD'})},
+        {text: 'Add period', onPress: () => Actions.addPeriod({date: d.date})},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
       ]
     );
@@ -92,9 +92,9 @@ export default class CalendarView extends React.Component {
 
   render() {
     const today = new Date(),
-      todayStr = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate(),
-      aWeekLater = new Date(today.getTime() +  7 * 24 * 60 * 60 * 1000),
-      aWeekLaterStr = aWeekLater.getFullYear() + '-' + (aWeekLater.getMonth() + 1) + '-' + aWeekLater.getDate();
+      todayStr = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      // aWeekLater = new Date(today.getTime() +  7 * 24 * 60 * 60 * 1000),
+      // aWeekLaterStr = aWeekLater.getFullYear() + '-' + (aWeekLater.getMonth() + 1) + '-' + aWeekLater.getDate();
 
     // Options
     let holiday = {

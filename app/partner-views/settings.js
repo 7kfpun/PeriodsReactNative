@@ -10,12 +10,16 @@ import {
   View,
 } from 'react-native';
 
+import Firebase from 'firebase';
+
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import { Cell, CustomCell,Section, TableView } from 'react-native-tableview-simple';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
+
+import { config } from '../config';
 
 export default class SettingsView extends React.Component {
   constructor(props) {
@@ -28,6 +32,14 @@ export default class SettingsView extends React.Component {
     };
   }
 
+  componentWillMount() {
+    this.firebaseRef = new Firebase(config.firebaseHost);
+  }
+
+  componentWillUnmount() {
+    this.firebaseRef.off();
+  }
+
   disconnect() {
     Alert.alert(
       'Remove linking',
@@ -35,8 +47,15 @@ export default class SettingsView extends React.Component {
       [
         {text: 'Cancel', onPress: () => console.log()},
         {text: 'OK', onPress: () => {
-          AsyncStorage.clear();
-          Actions.selectGender();
+          store.get('uuid').then((uuid) => {
+            store.get('partnerUuid').then((partnerUuid) => {
+              if (uuid && partnerUuid) {
+                this.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).remove();
+                AsyncStorage.clear();
+                Actions.selectGender();
+              }
+            });
+          });
         }},
       ]
     );

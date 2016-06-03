@@ -25,7 +25,9 @@ export default class QRCodeReaderView extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      value: this.props.value,
+    };
   }
 
   componentWillMount() {
@@ -48,6 +50,7 @@ export default class QRCodeReaderView extends React.Component {
           store.save('gender', 'male');
           var partnerUuid = keys[0];
           console.log('partnerUuid', partnerUuid);
+          store.save('partnerUuid', partnerUuid);
           that.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).set({
             uuid: uuid,
             gender: 'male',

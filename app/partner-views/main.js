@@ -51,15 +51,17 @@ export default class DemoReactNative extends React.Component {
       });
     });
 
-    store.get('uuid').then((uuid) => {
-      if (uuid) {
-        this.firebaseRef.child('users').child(uuid).on('value', (snapshot) => {
+    store.get('partnerUuid').then((partnerUuid) => {
+      if (partnerUuid) {
+        this.setState({partnerUuid: partnerUuid});
+        this.firebaseRef.child('users').child(partnerUuid).on('value', (snapshot) => {
           console.log('check', snapshot.val());
           let values = snapshot.val();
           if (values !== null) {
             store.save('periods', values.periods);
             store.save('settings', values.settings);
             that.setState({
+              partnerUuid: partnerUuid,
               periods: values.periods,
               settings: values.settings,
               key: Math.random(),
@@ -134,6 +136,10 @@ export default class DemoReactNative extends React.Component {
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
+        <View style={styles.partnerBlock}>
+          <Text style={styles.headerText}>{'You are linking to'}</Text>
+          <Text style={styles.headerText}>{this.state.partnerUuid}</Text>
+        </View>
         <View style={styles.predictionBlock}>
           <View style={styles.dayLeftheader}>
             {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
@@ -144,6 +150,7 @@ export default class DemoReactNative extends React.Component {
           </View>
         </View>
         <View style={styles.suggestionBlock}>
+          <Text style={styles.headerText}>{'Show me the money'}</Text>
         </View>
 
         {Platform.OS === 'android' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.android} />}
@@ -178,12 +185,21 @@ const styles = StyleSheet.create({
     height: 56,
     backgroundColor: '#5C6BC0',
   },
-  predictionBlock: {
+  partnerBlock: {
     flex: 1,
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: 'white',
     margin: 10,
+    marginTop: 5,
+  },
+  predictionBlock: {
+    flex: 2,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    margin: 10,
+    marginTop: 5,
     marginBottom: 5,
   },
   dayLeftheader: {
@@ -198,6 +214,8 @@ const styles = StyleSheet.create({
   },
   suggestionBlock: {
     flex: 1,
+    justifyContent: 'space-around',
+    alignItems: 'center',
     backgroundColor: 'white',
     margin: 10,
     marginTop: 5,

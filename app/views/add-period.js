@@ -50,7 +50,7 @@ export default class AddPeriodView extends React.Component {
     PeriodActions.addPeriod({
       date: this.state.date,
       length: this.state.length,
-      type: 'PERIOD',
+      event: 'PERIOD',
     });
     Actions.pop();
   }

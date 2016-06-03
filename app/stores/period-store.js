@@ -47,7 +47,7 @@ class PeriodStore {
       if (isLinkingEnabled) {
         store.get('uuid').then((uuid) => {
           let firebaseRef = new Firebase(config.firebaseHost);
-          firebaseRef.child('users').child(uuid).update({calendar: periods});
+          firebaseRef.child('users').child(uuid).update({periods: periods});
           firebaseRef.off();
         });
       }
@@ -57,7 +57,7 @@ class PeriodStore {
   handleAddPeriod(period) {
     console.log('handleAddPeriod', period);
     period.uuid = guid();
-    period.type = 'PERIOD';
+    period.event = 'PERIOD';
     this.periods.push(period);
     this.sortPeriod();
     this.save(this.periods);
@@ -85,7 +85,7 @@ class PeriodStore {
     let p = this.periods.filter((item) => item.uuid === period.uuid)[0];
     p.date = period.date;
     p.length = period.length;
-    p.type = period.type;
+    p.event = period.event;
     this.sortPeriod();
     this.save(this.periods);
   }

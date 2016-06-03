@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AsyncStorage,
   Dimensions,
   Platform,
   ScrollView,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 
 import Firebase from 'firebase';
+import moment from 'moment';
 
 // 3rd party libraries
 import { AdMobBanner } from 'react-native-admob';
@@ -18,8 +18,6 @@ import GiftedListView from 'react-native-gifted-listview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
-
-import moment from 'moment';
 
 const { WIDTH } = Dimensions.get('window');
 
@@ -43,12 +41,15 @@ export default class DemoReactNative extends React.Component {
   }
 
   componentDidMount() {
+    this.pullData();
+  }
+
+  pullData() {
     let that = this;
 
-
-    store.get('uuid').then((uuid) => {
-      if (uuid) {
-        this.firebaseRef.child('users').child(uuid).on('value', (snapshot) => {
+    store.get('partnerUuid').then((partnerUuid) => {
+      if (partnerUuid) {
+        this.firebaseRef.child('users').child(partnerUuid).on('value', (snapshot) => {
           console.log('check', snapshot.val());
           let values = snapshot.val();
           if (values !== null) {
@@ -113,7 +114,7 @@ export default class DemoReactNative extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={AsyncStorage.clear} />}
+          rightButton={<Icon style={styles.navigatorRightButton} name="refresh" size={26} color="white" onPress={() => this.pullData()} />}
         />
       );
     } else if (Platform.OS === 'android') {
@@ -141,7 +142,7 @@ export default class DemoReactNative extends React.Component {
             pagination={true}
             paginationWaitingView={this._renderPaginationWaitingView}
 
-            refreshable={false}
+            refreshable={true}
             withSections={false} // enable sections
             customStyles={{
               paginationView: {

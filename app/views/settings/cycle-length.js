@@ -75,19 +75,21 @@ export default class CycleLengthSettingsView extends React.Component {
         <ScrollView>
           <TableView>
             <Section header="CYCLE LENGTH" footer="Count the number of days from whenyour period starts to the day before the next one begins.">
-              <Slider
-                style={sliderStyles.container}
-                trackStyle={sliderStyles.track}
-                thumbStyle={sliderStyles.thumb}
-                minimumTrackTintColor="#31a4db"
-                thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.value}
-                onValueChange={(value) => this.setState({value})}
-                minimumValue={10}
-                maximumValue={180}
-                step={1}
-              />
-              <Text>Value: {this.state.value}</Text>
+              <View style={{backgroundColor: 'white'}}>
+                <Slider
+                  style={sliderStyles.container}
+                  trackStyle={sliderStyles.track}
+                  thumbStyle={sliderStyles.thumb}
+                  minimumTrackTintColor="#31a4db"
+                  thumbTouchSize={{width: 50, height: 40}}
+                  value={this.state.value}
+                  onValueChange={(value) => this.setState({value})}
+                  minimumValue={1}
+                  maximumValue={180}
+                  step={1}
+                />
+              </View>
+              <Text style={{marginLeft: 20}}>Value: {this.state.value}</Text>
             </Section>
 
           </TableView>
@@ -101,8 +103,8 @@ export default class CycleLengthSettingsView extends React.Component {
 const sliderStyles = StyleSheet.create({
   container: {
     height: 45,
-    marginLeft: 30,
-    marginRight: 30,
+    marginLeft: 20,
+    marginRight: 20,
     backgroundColor: 'white',
   },
   track: {

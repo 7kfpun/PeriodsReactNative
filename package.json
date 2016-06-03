@@ -14,6 +14,7 @@
     "react-native": "^0.26.2",
     "react-native-admob": "^1.0.0",
     "react-native-barcode-scanner-universal": "^1.0.5",
+    "react-native-camera": "git://github.com/lwansbrough/react-native-camera",
     "react-native-datetime": "^0.1.2",
     "react-native-gifted-listview": "0.0.15",
     "react-native-navbar": "^1.5.0",

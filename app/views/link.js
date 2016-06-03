@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Alert,
+  Dimensions,
   Platform,
   ScrollView,
   StyleSheet,
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Dimensions from 'Dimensions';
 
 import Firebase from 'firebase';
 import moment from 'moment';
