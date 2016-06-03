@@ -35,6 +35,8 @@ export default class CalendarView extends React.Component {
   componentDidMount() {
     PeriodStore.listen((state) => this.onPeriodStoreChange(state));
     SettingStore.listen((state) => this.onSettingStoreChange(state));
+
+    this.updateStatistics();
   }
 
   componentWillUnmount() {
@@ -44,28 +46,15 @@ export default class CalendarView extends React.Component {
 
   updateStatistics() {
     if (this.state.periods.length > 0) {
-      let startedPeriod;
-      if (this.state.periods.filter((item) => item.length === undefined).length === 1) {
-        startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
-        this.setState({
-          isStarted: true,
-          daysOfPeriod: moment().diff(moment(startedPeriod.date), 'days'),
-          daysLeft: null,
-        });
-      } else {
-        this.setState({
-          isStarted: false,
-          daysOfPeriod: null,
-          daysLeft: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').diff(moment(), 'days') + 1,
-        });
+      let cycleDiffs = [];
+      for (let i = 0; i < this.state.periods.length - 1; i++) {
+        cycleDiffs.push(moment(this.state.periods[i].date).diff(this.state.periods[i + 1].date, 'days'));
       }
+      console.log('cycleDiffs', cycleDiffs);
 
       this.setState({
-        nextPeriod: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').format('MMM D'),
-        nextFertile: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE - this.state.settings.OVULATION_FERTILE.VALUE, 'days').format('MMM D'),
-
         averagePeriodDays: Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
-        averageCycleDays: 'TODO',  // Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
+        averageCycleDays: Math.round(cycleDiffs.reduce((a, b) => a + b, 0) / cycleDiffs.length),
       });
 
     } else {
@@ -82,6 +71,7 @@ export default class CalendarView extends React.Component {
       periods: state.periods,
       key: Math.random(),
     });
+    this.updateStatistics();
   }
 
   onSettingStoreChange(state) {
@@ -192,8 +182,29 @@ export default class CalendarView extends React.Component {
             </View>
           </View>
 
-          {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
-          {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+          <View style={[styles.block, {flex: 1}]}>
+            <View style={[styles.header, {marginTop: 8}]}>
+              <Text style={styles.headerText}>Statistics</Text>
+              <Text style={styles.subHeaderText}>Average</Text>
+            </View>
+            <View style={styles.header}>
+              <Text style={styles.subHeaderText}>Average period days</Text>
+              <Text style={styles.subHeaderHighlightText}>
+                {this.state.averagePeriodDays} Days
+              </Text>
+            </View>
+            <View style={[styles.header, {marginBottom: 8}]}>
+              <Text style={styles.subHeaderText}>Average period cycle</Text>
+              <Text style={styles.subHeaderHighlightText}>
+                {this.state.averageCycleDays} Days
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rectangleAdBlock}>
+            {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
+            {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+          </View>
         </ScrollView>
       </View>
     );
@@ -297,5 +308,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+  },
+  rectangleAdBlock: {
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: '#424242',
+    alignItems: 'center',
   },
 });

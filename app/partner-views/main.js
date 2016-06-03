@@ -117,6 +117,7 @@ export default class DemoReactNative extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#5C6BC0', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
         />

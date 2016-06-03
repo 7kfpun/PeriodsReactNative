@@ -66,6 +66,7 @@ export default class EditHistoryView extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#EF5350', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
           leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={() => Actions.pop()} />}

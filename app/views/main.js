@@ -59,23 +59,9 @@ export default class Main extends React.Component {
         });
       }
 
-      let cycleDiffs = [];
-      for (let i = 0; i < this.state.periods.length - 1; i++) {
-        cycleDiffs.push(moment(this.state.periods[i].date).diff(this.state.periods[i + 1].date, 'days'));
-      }
-      console.log('cycleDiffs', cycleDiffs);
-
       this.setState({
         nextPeriod: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE, 'days').format('MMM D'),
         nextFertile: moment(this.state.periods[0].date).add(this.state.settings.CYCLE_LENGTH.VALUE - this.state.settings.OVULATION_FERTILE.VALUE - 5, 'days').format('MMM D'),
-
-        averagePeriodDays: Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
-        averageCycleDays: Math.round(cycleDiffs.reduce((a, b) => a + b, 0) / cycleDiffs.length),
-      });
-    } else {
-      this.setState({
-        averagePeriodDays: '/',
-        averageCycleDays: '/',
       });
     }
   }
@@ -107,6 +93,7 @@ export default class Main extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#EF5350', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
           rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={Actions.settings} />}
@@ -168,25 +155,6 @@ export default class Main extends React.Component {
         {this.renderToolbar()}
         <View style={{flex: 1}}>
           {this.render_prediction_block()}
-
-          <View style={[styles.block, {flex: 1}]}>
-            <View style={[styles.header, {marginTop: 8}]}>
-              <Text style={styles.headerText}>Statistics</Text>
-              <Text style={styles.subHeaderText}>Average</Text>
-            </View>
-            <View style={styles.header}>
-              <Text style={styles.subHeaderText}>Average period days</Text>
-              <Text style={styles.subHeaderHighlightText}>
-                {this.state.averagePeriodDays} Days
-              </Text>
-            </View>
-            <View style={[styles.header, {marginBottom: 8}]}>
-              <Text style={styles.subHeaderText}>Average period cycle</Text>
-              <Text style={styles.subHeaderHighlightText}>
-                {this.state.averageCycleDays} Days
-              </Text>
-            </View>
-          </View>
         </View>
 
         {Platform.OS === 'android' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.android} />}

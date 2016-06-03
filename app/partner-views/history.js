@@ -112,6 +112,7 @@ export default class DemoReactNative extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#5C6BC0', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
           rightButton={<Icon style={styles.navigatorRightButton} name="refresh" size={26} color="white" onPress={() => this.pullData()} />}
@@ -153,8 +154,10 @@ export default class DemoReactNative extends React.Component {
             refreshableTintColor="blue"
           />
 
-          {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
-          {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+          <View style={styles.rectangleAdBlock}>
+            {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
+            {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+          </View>
         </ScrollView>
       </View>
     );
@@ -221,5 +224,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 32,
     color: '#9E9E9E',
+  },
+  rectangleAdBlock: {
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: '#424242',
+    alignItems: 'center',
   },
 });

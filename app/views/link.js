@@ -27,6 +27,7 @@ const WIDTH = Dimensions.get('window').width;
 
 import { config } from '../config';
 import { guid } from '../utils/guid';
+import { token } from '../utils/token';
 
 export default class LinkView extends React.Component {
   constructor(props) {
@@ -84,7 +85,7 @@ export default class LinkView extends React.Component {
           {text: 'OK', onPress: () => {
             let uuid = guid();
             let linkingToken = {
-              token: guid(),
+              token: token(),
               expiredDate: moment().add(1, 'day').format(),
             };
             this.setState({
@@ -136,7 +137,7 @@ export default class LinkView extends React.Component {
 
   updateToken() {
     let linkingToken = {
-      token: guid(),
+      token: token(),
       expiredDate: moment().add(1, 'day').format(),
     };
     this.setState({
@@ -171,7 +172,7 @@ export default class LinkView extends React.Component {
 
   share() {
     Share.open({
-      share_text: this.state.uuid,
+      share_text: this.state.linkingToken.token,
       share_URL: 'http://google.cl',
       title: "Download app from 'URL' and input this 'CODE' to pair with your partner."
     },(e) => {
@@ -189,6 +190,7 @@ export default class LinkView extends React.Component {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#EF5350', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
           rightButton={<EvilIcon style={styles.navigatorRightButton} name="share-apple" size={32} color="white" onPress={() => this.share()} />}
@@ -255,7 +257,7 @@ export default class LinkView extends React.Component {
                     />;
                   });
                   default:      return <Cell
-                    key={''}
+                    key={this.state.key}
                     cellstyle="Basic"
                     title={'Tap to share the CODE to your partnar'}
                     onPress={() => this.share()}
