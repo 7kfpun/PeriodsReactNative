@@ -47,9 +47,9 @@ console.ignoredYellowBox = [
 class TabIcon extends React.Component {
   render() {
     return (
-      <View style={{paddingTop: 100, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{alignItems: 'center'}}>
         <Icon style={{color: this.props.selected ? '#EF5350' : '#616161'}} name={this.props.tabIcon} size={24} />
-        {/*<Text style={{fontSize: 10, margin: 0, color: this.props.selected ? 'red' : 'black'}}>{this.props.tabName}</Text>*/}
+        {/*<Text style={{color: this.props.selected ? '#EF5350' : '#616161', fontSize: 10}}>{this.props.tabName}</Text>*/}
       </View>
     );
   }
@@ -58,9 +58,9 @@ class TabIcon extends React.Component {
 class TabIconMale extends React.Component {
   render() {
     return (
-      <View style={{paddingTop: 100, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{alignItems: 'center'}}>
         <Icon style={{color: this.props.selected ? '#5C6BC0' : '#616161'}} name={this.props.tabIcon} size={24} />
-        {/*<Text style={{fontSize: 10, margin: 0, color: this.props.selected ? 'red' : 'black'}}>{this.props.tabName}</Text>*/}
+        {/*<Text style={{color: this.props.selected ? '#5C6BC0' : '#616161', fontSize: 10}}>{this.props.tabName}</Text>*/}
       </View>
     );
   }
@@ -75,6 +75,7 @@ const scenes = Actions.create(
         <Scene key="home" title="Period Calendar" tabIcon="home" tabName="Home" component={Main} hideNavBar={true} icon={TabIcon} />
         <Scene key="calendar" title="Calendar" tabIcon="today" tabName="Calendar" component={CalendarView} hideNavBar={true} icon={TabIcon} />
         <Scene key="history" title="History" tabIcon="history" tabName="History" component={HistoryView} hideNavBar={true} icon={TabIcon} />
+        <Scene key="link" title="Linking" tabIcon="person-add" tabName="Linking" component={LinkView} hideNavBar={true} icon={TabIcon} />
       </Scene>
     </Scene>
 
@@ -87,8 +88,6 @@ const scenes = Actions.create(
     <Scene key="periodLengthSettings" title="Period Length" component={PeriodLengthSettingsView} />
     <Scene key="cycleLengthSettings" title="Cycle Length" component={CycleLengthSettingsView} />
     <Scene key="ovulationFertileSettings" title="Ovulation and Fertile" component={OvulationFertileSettingsView} />
-
-    <Scene key="link" title="Link" component={LinkView} />
 
     <Scene key="qrcodeReader" title="QR Code Reader" component={QRCodeReaderView}  type="reset" />
     <Scene key="inputCode" title="Input code" component={InputCodeView} />

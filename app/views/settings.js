@@ -86,23 +86,18 @@ export default class SettingsView extends React.Component {
                 detail={this.state.settings.OVULATION_FERTILE.VALUE + ' Days'}
                 onPress={() => Actions.ovulationFertileSettings()}
               />
-              {/*<CustomCell>
-                <Text style={{flex: 1, fontSize: 16, color: 'black'}}>Pregnancy</Text>
-                <Switch
-                  onValueChange={(value) => this.setState({IS_PREGNANCY: value})}
-                  value={this.state.IS_PREGNANCY} />
-              </CustomCell>*/}
-            </Section>
-
-            <Section header="LINK">
-              <Cell cellstyle="Basic" title="Linking Accounts" onPress={Actions.link} />
             </Section>
 
             <Section header="DEVELOPMENT">
               <Cell
                 cellstyle="Basic"
                 title="Print all"
-                onPress={() => {store.get('periods').then((periods) => console.log(periods)); store.get('settings').then((settings) => console.log(settings));}}
+                onPress={() => {
+                  store.get('uuid').then((uuid) => console.log(uuid));
+                  store.get('gender').then((gender) => console.log(gender));
+                  store.get('periods').then((periods) => console.log(periods));
+                  store.get('settings').then((settings) => console.log(settings));
+                }}
               />
               <Cell
                 cellstyle="Basic"

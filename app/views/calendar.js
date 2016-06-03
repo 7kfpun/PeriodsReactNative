@@ -84,7 +84,7 @@ export default class CalendarView extends React.Component {
       'Add on ' + moment(d.date).format('MMM D, YYYY'),
       '',
       [
-        {text: 'Add period', onPress: () => Actions.addPeriod({date: d.date})},
+        {text: 'Add period', onPress: () => Actions.addPeriod({date: d.date, type: 'PERIOD'})},
         {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
       ]
     );

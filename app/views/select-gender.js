@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  StatusBar,
   StyleSheet,
   Text,
   TouchableHighlight,
@@ -12,8 +11,6 @@ import { Actions } from 'react-native-router-flux';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import store from 'react-native-simple-store';
 
-StatusBar.setHidden(true);
-
 export default class SelectGenderView extends React.Component {
   constructor(props) {
     super(props);
@@ -21,14 +18,11 @@ export default class SelectGenderView extends React.Component {
 
   selectFemale() {
     Actions.main();
-    StatusBar.setHidden(false);
     store.save('gender', 'female');
   }
 
   selectMale() {
-    Actions.qrcodeReader()
-    StatusBar.setHidden(false);
-    store.save('gender', 'male');
+    Actions.qrcodeReader();
   }
 
   render() {

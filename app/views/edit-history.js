@@ -44,6 +44,7 @@ export default class EditHistoryView extends React.Component {
       uuid: this.props.uuid,
       date: this.state.date,
       length: this.state.length,
+      type: 'PERIOD',
     });
     Actions.pop();
   }

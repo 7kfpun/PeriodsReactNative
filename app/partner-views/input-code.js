@@ -16,7 +16,10 @@ import NavigationBar from 'react-native-navbar';
 import Toast from 'react-native-root-toast';
 import store from 'react-native-simple-store';
 
+import moment from 'moment';
+
 import { config } from '../config';
+import { guid } from '../utils/guid';
 
 export default class QRCodeReaderView extends React.Component {
   constructor(props) {
@@ -33,25 +36,30 @@ export default class QRCodeReaderView extends React.Component {
     this.firebaseRef.off();
   }
 
-  connect() {
-    this.state.value;
-    // let that = this;
-    this.firebaseRef.child('users').child(this.state.value).on('value', (snapshot) => {
-      console.log('check', snapshot.val());
-      let values = snapshot.val();
-      if (values !== null) {
-        store.save('gender', 'male');
-        store.save('uuid', this.state.value);
+  connect(linkingToken) {
+    var that = this;
+    console.log('linkingToken', linkingToken);
+    this.firebaseRef.child('users').orderByChild('linkingToken/token').equalTo(linkingToken).once('value', function(snapshot) {
+      if (snapshot.val()) {
+        var keys = Object.keys(snapshot.val());
+        if (keys.length > 0) {
+          var uuid = guid();
+          store.save('uuid', uuid);
+          store.save('gender', 'male');
+          var partnerUuid = keys[0];
+          console.log('partnerUuid', partnerUuid);
+          that.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).set({
+            uuid: uuid,
+            gender: 'male',
+            linkedDate: moment().format(),
+          });
 
-        Toast.show('Nice! You have linked the calendar with your partnar.', {
-          duration: Toast.durations.SHORT,
-          position: Toast.positions.BOTTOM,
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-          onHidden: Actions.mainMale,
-        });
+          Toast.show('Nice! You have linked the calendar with your partnar.', {
+            duration: Toast.durations.SHORT,
+            position: Toast.positions.BOTTOM,
+            onHidden: Actions.mainMale,
+          });
+        }
       }
     });
   }
@@ -100,7 +108,7 @@ export default class QRCodeReaderView extends React.Component {
               placeholder={'Or input the CODE here'}
               placeholderTextColor="#9E9E9E"
             />
-            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => this.connect()} >
+            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => this.connect(this.state.value)} >
               {'Connect'}
             </Button>
           </View>

@@ -42,9 +42,8 @@ export default class Main extends React.Component {
 
   updateStatistics() {
     if (this.state.periods.length > 0) {
-      let startedPeriod;
       if (this.state.periods.filter((item) => item.length === undefined).length === 1) {
-        startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
+        let startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
         this.setState({
           isStarted: true,
           startedPeriod: startedPeriod,
@@ -73,8 +72,6 @@ export default class Main extends React.Component {
         averagePeriodDays: Math.round(this.state.periods.filter((item) => item.length !== undefined).map((item) => item.length).reduce((a, b) => a + b, 0) / this.state.periods.filter((item) => item.length !== undefined).length),
         averageCycleDays: Math.round(cycleDiffs.reduce((a, b) => a + b, 0) / cycleDiffs.length),
       });
-
-
     } else {
       this.setState({
         averagePeriodDays: '/',
@@ -132,7 +129,7 @@ export default class Main extends React.Component {
 
   render_prediction_block() {
     if (this.state.periods && this.state.periods.length > 0) {
-      return <View style={[styles.block, {flex: 2, marginTop: 10}]}>
+      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
         <View style={styles.dayLeftheader}>
           {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
           {this.state.daysLeft !== null &&  this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
@@ -151,7 +148,7 @@ export default class Main extends React.Component {
         </View>
       </View>;
     } else {
-      return <View style={[styles.block, {flex: 2, marginTop: 10}]}>
+      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
         <View style={styles.dayLeftheader}>
           <Text style={styles.headerText}>Please enter your period.</Text>
         </View>
@@ -239,7 +236,7 @@ const styles = StyleSheet.create({
   },
   dayLeftheader: {
     marginTop: 15,
-    marginBottom: 10,
+    marginBottom: 15,
     marginLeft: 10,
     marginRight: 10,
   },
@@ -253,6 +250,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: '#212121',
     fontSize: 20,
+    marginBottom: 20,
   },
   subHeaderText: {
     color: '#212121',
@@ -264,6 +262,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
+    width: 260,
     marginLeft: 15,
     marginRight: 15,
     marginBottom: 10,
