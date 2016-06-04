@@ -66,9 +66,20 @@ class TabIconMale extends React.Component {
   }
 }
 
+class WhiteInitialView extends React.Component {
+  render() {
+    return (
+      <View style={{backgroundColor: 'white'}} />
+    );
+  }
+}
+
+
 const scenes = Actions.create(
   <Scene key="root" hideNavBar={true}>
-    <Scene key="selectGender" title="Select your gender" component={SelectGenderView} initial={true} type="reset" />
+
+    <Scene key="whiteInitial" component={WhiteInitialView} initial={true} type="reset" />
+    <Scene key="selectGender" title="Select your gender" component={SelectGenderView} type="reset" />
 
     <Scene key="main" component={NavigationDrawer} type="reset">
       <Scene key="tabbar" tabs={true}>
@@ -109,6 +120,8 @@ export default class Periods extends React.Component {
         Actions.main();
       } else if (gender === 'male') {
         Actions.mainMale();
+      } else {
+        Actions.selectGender();
       }
     });
   }
