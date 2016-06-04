@@ -44,7 +44,7 @@ public class MainActivity extends ReactActivity {
             new RNAdMobPackage(),
             new BarcodeScanner(),
             new RCTCameraPackage(),
-            new RCTDateTimePickerPackage(),
+            new RCTDateTimePickerPackage(this),
             new VectorIconsPackage(),
             new RNSharePackage()
         );
