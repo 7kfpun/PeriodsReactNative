@@ -16,6 +16,7 @@ import moment from 'moment';
 
 // 3rd party libraries
 import { Cell, CustomCell, Section, TableView } from 'react-native-tableview-simple';
+import Button from 'apsl-react-native-button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import NavigationBar from 'react-native-navbar';
@@ -171,10 +172,17 @@ export default class LinkView extends React.Component {
   }
 
   share() {
+    let share_text;
+    if (this.state.enableLinking && this.state.linkingToken) {
+      share_text =  "Download the best Period Calender app and input this 'CODE' to pair with your partner. CODE: " + this.state.linkingToken.token;
+    } else {
+      share_text =  'Download the best Period Calender app and pair with your partner for free.';
+    }
+
     Share.open({
-      share_text: this.state.linkingToken.token,
+      share_text: share_text,
       share_URL: 'http://google.cl',
-      title: "Download app from 'URL' and input this 'CODE' to pair with your partner."
+      title: 'Period Calender',
     },(e) => {
       console.log(e);
     });
@@ -230,7 +238,11 @@ export default class LinkView extends React.Component {
                 && <View style={{backgroundColor: 'white'}}>
                     <TouchableOpacity style={styles.qrBlock} onPress={() => this.share()}>
                       <View>
-                        <Icon style={{alignItems: 'flex-end', margin: 10}} name="refresh" size={32} color="gray" onPress={() => this.updateToken()} />
+                        <Button style={styles.button} textStyle={{fontSize: 18, color: '#121212'}} onPress={() => this.updateToken()} >
+                          {this.state.linkingToken.token}
+                          <Icon name="refresh" size={20} color="#121212" />
+                        </Button>
+
                         <QRCode
                           key={this.state.key}
                           value={this.state.linkingToken.token}
@@ -296,6 +308,18 @@ const styles = StyleSheet.create({
   toolbar: {
     height: 56,
     backgroundColor: '#EF5350',
+  },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0,
+    borderRadius: 0,
+    backgroundColor: 'white',
+  },
+  codeText: {
+    fontSize: 20,
+    textAlign: 'center'
   },
   qrBlock: {
     height: 360,

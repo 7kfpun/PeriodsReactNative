@@ -117,7 +117,7 @@ export default class Main extends React.Component {
   render_prediction_block() {
     if (this.state.periods && this.state.periods.length > 0) {
       return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
-        <View style={styles.dayLeftheader}>
+        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
           {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
           {this.state.daysLeft !== null &&  this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
           {this.state.daysOfPeriod !== null && this.state.daysOfPeriod !== 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{getOrdinal(this.state.daysOfPeriod + 1)}</Text>{' DAY OF PERIOD'}</Text>}
@@ -136,7 +136,7 @@ export default class Main extends React.Component {
       </View>;
     } else {
       return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
-        <View style={styles.dayLeftheader}>
+        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
           <Text style={styles.headerText}>Please enter your period.</Text>
         </View>
 
@@ -157,8 +157,8 @@ export default class Main extends React.Component {
           {this.render_prediction_block()}
         </View>
 
-        {Platform.OS === 'android' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.android} />}
-        {Platform.OS === 'ios' && <AdMobBanner bannerSize={"smartBannerPortrait"} adUnitID={config.adUnitID.ios} />}
+        {Platform.OS === 'android' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.android} />}
+        {Platform.OS === 'ios' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.ios} />}
       </View>
     );
   }
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   subHeaderText: {
-    color: '#212121',
+    color: '#808080',
     fontSize: 16,
   },
   subHeaderHighlightText: {

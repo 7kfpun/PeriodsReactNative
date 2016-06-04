@@ -46,20 +46,24 @@ export default class QRCodeReaderView extends React.Component {
   }
 
   checkCamera() {
-    Camera.checkDeviceAuthorizationStatus().then(isAuthorized => {
-      console.log(isAuthorized);
-      if (isAuthorized) {
-        this.setState({cameraAvailable: true});
-      } else {
-        Alert.alert(
-          'Camera Access Denied',
-          'Go to Settings / Privacy / Camera and enable access for this app',
-          [
-            {text: 'OK', onPress:() => console.log()},
-          ]
-        );
-      }
-    }).catch(err => console.error(err));
+    if (Platform.OS === 'ios') {
+      Camera.checkDeviceAuthorizationStatus().then(isAuthorized => {
+        console.log(isAuthorized);
+        if (isAuthorized) {
+          this.setState({cameraAvailable: true});
+        } else {
+          Alert.alert(
+            'Camera Access Denied',
+            'Go to Settings / Privacy / Camera and enable access for this app',
+            [
+              {text: 'OK', onPress:() => console.log()},
+            ]
+          );
+        }
+      }).catch(err => console.error(err));
+    } else {
+      this.setState({cameraAvailable: true});
+    }
   }
 
   connect(linkingToken) {

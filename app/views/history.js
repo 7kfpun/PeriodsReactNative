@@ -28,8 +28,6 @@ export default class CalendarView extends React.Component {
     super(props);
 
     this.state = Object.assign({}, PeriodStore.getState(), SettingStore.getState());
-    // this.state = PeriodStore.getState();
-    // this.state.settings = data.settings;
   }
 
   componentDidMount() {
@@ -81,7 +79,7 @@ export default class CalendarView extends React.Component {
 
   _onFetch(page = 1, callback, options) {
     var rows = this.state.periods.slice(4 * (page - 1), 4 * page);
-    if (4 * page > this.state.periods.length) {
+    if (4 * page >= this.state.periods.length) {
       callback(rows, {
         allLoaded: true, // the end of the list is reached
       });
@@ -98,8 +96,8 @@ export default class CalendarView extends React.Component {
         onPress={() => Actions.editHistory(rowData)}
       >
         <View>
-          <Text>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
-          <Text>Length: {rowData.length}</Text>
+          <Text style={styles.historyText}>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
+          <Text style={styles.historyText}>Length: {rowData.length}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -126,10 +124,15 @@ export default class CalendarView extends React.Component {
     );
   }
 
+  _renderPaginationAllLoadedView() {
+    return null;
+  }
+
   renderToolbar() {
     if (Platform.OS === 'ios') {
       return (
         <NavigationBar
+          statusBar={{tintColor: '#EF5350', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
           rightButton={<Icon style={styles.navigatorRightButton} name="settings" size={26} color="white" onPress={Actions.settings} />}
@@ -168,6 +171,8 @@ export default class CalendarView extends React.Component {
               refreshable={false}
               withSections={false}
 
+              paginationAllLoadedView={this._renderPaginationAllLoadedView}
+
               pagination={true}
               paginationWaitingView={this._renderPaginationWaitingView}
 
@@ -182,7 +187,7 @@ export default class CalendarView extends React.Component {
             </View>
           </View>
 
-          <View style={[styles.block, {flex: 1}]}>
+          <View style={styles.block}>
             <View style={[styles.header, {marginTop: 8}]}>
               <Text style={styles.headerText}>Statistics</Text>
               <Text style={styles.subHeaderText}>Average</Text>
@@ -202,8 +207,8 @@ export default class CalendarView extends React.Component {
           </View>
 
           <View style={styles.rectangleAdBlock}>
-            {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
-            {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+            {Platform.OS === 'android' && <AdMobBanner bannerSize={'mediumRectangle'} adUnitID={config.adUnitID.android} />}
+            {Platform.OS === 'ios' && <AdMobBanner bannerSize={'mediumRectangle'} adUnitID={config.adUnitID.ios} />}
           </View>
         </ScrollView>
       </View>
@@ -273,6 +278,9 @@ const styles = StyleSheet.create({
   subHeaderHighlightText: {
     color: '#EF5350',
     fontSize: 16,
+  },
+  historyText: {
+    color: '#808080',
   },
   row: {
     height: 50,

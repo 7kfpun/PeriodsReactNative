@@ -67,7 +67,7 @@ export default class DemoReactNative extends React.Component {
 
   _onFetch(page = 1, callback, options) {
     var rows = this.state.periods.slice(4 * (page - 1), 4 * page);
-    if (4 * page > this.state.periods.length) {
+    if (4 * page >= this.state.periods.length) {
       callback(rows, {
         allLoaded: true, // the end of the list is reached
       });
@@ -108,6 +108,10 @@ export default class DemoReactNative extends React.Component {
     );
   }
 
+  _renderPaginationAllLoadedView() {
+    return null;
+  }
+
   renderToolbar() {
     if (Platform.OS === 'ios') {
       return (
@@ -139,6 +143,10 @@ export default class DemoReactNative extends React.Component {
             rowView={this._renderRowView}
             onFetch={(page, callback) => this._onFetch(page, callback)}
             firstLoader={true}
+            refreshable={false}
+            withSections={false}
+
+            paginationAllLoadedView={this._renderPaginationAllLoadedView}
 
             pagination={true}
             paginationWaitingView={this._renderPaginationWaitingView}
@@ -155,8 +163,8 @@ export default class DemoReactNative extends React.Component {
           />
 
           <View style={styles.rectangleAdBlock}>
-            {Platform.OS === 'android' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.android} />}
-            {Platform.OS === 'ios' && <AdMobBanner style={{marginLeft: 10}} bannerSize={"mediumRectangle"} adUnitID={config.adUnitID.ios} />}
+            {Platform.OS === 'android' && <AdMobBanner bannerSize={'mediumRectangle'} adUnitID={config.adUnitID.android} />}
+            {Platform.OS === 'ios' && <AdMobBanner bannerSize={'mediumRectangle'} adUnitID={config.adUnitID.ios} />}
           </View>
         </ScrollView>
       </View>

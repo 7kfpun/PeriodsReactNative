@@ -104,19 +104,21 @@ export default class EditHistoryView extends React.Component {
             </Section>
 
             <Section header="BLEEDING DAYS">
-              <Slider
-                style={sliderStyles.container}
-                trackStyle={sliderStyles.track}
-                thumbStyle={sliderStyles.thumb}
-                minimumTrackTintColor="#31a4db"
-                thumbTouchSize={{width: 50, height: 40}}
-                value={this.state.length}
-                onValueChange={(length) => this.setState({length})}
-                minimumValue={1}
-                maximumValue={30}
-                step={1}
-              />
-              <Text>Value: {this.state.length}</Text>
+              <View style={{backgroundColor: 'white'}}>
+                <Slider
+                  style={sliderStyles.container}
+                  trackStyle={sliderStyles.track}
+                  thumbStyle={sliderStyles.thumb}
+                  minimumTrackTintColor="#31a4db"
+                  thumbTouchSize={{width: 50, height: 40}}
+                  value={this.state.length}
+                  onValueChange={(length) => this.setState({length})}
+                  minimumValue={1}
+                  maximumValue={30}
+                  step={1}
+                />
+              </View>
+              <Text style={{marginLeft: 20}}>Value: {this.state.length}</Text>
             </Section>
 
             <Section>

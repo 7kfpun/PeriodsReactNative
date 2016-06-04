@@ -6,6 +6,8 @@ import {
   View,
 } from 'react-native';
 
+import moment from 'moment';
+
 // Flux
 import PeriodStore from '../stores/period-store';
 import SettingStore from '../stores/setting-store';
@@ -14,8 +16,6 @@ import SettingStore from '../stores/setting-store';
 import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-
-import moment from 'moment';
 
 import Calendar from '../utils/calendar';
 
@@ -51,6 +51,13 @@ export default class CalendarView extends React.Component {
       key: Math.random(),
     });
   }
+
+  onActionSelected(position) {
+    if (position === 0) {  // index of 'Settings'
+      Actions.settings();
+    }
+  }
+
 
   renderToolbar() {
     if (Platform.OS === 'ios') {
@@ -185,7 +192,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    marginBottom: 40,
+    marginBottom: 50,
   },
   navigatorBarIOS: {
     backgroundColor: '#EF5350',
