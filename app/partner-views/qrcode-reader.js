@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginBottom: 20,
+    borderWidth: 0,
     borderRadius: 0,
     backgroundColor: '#424242',
   },

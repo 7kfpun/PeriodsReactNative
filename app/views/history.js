@@ -89,6 +89,7 @@ export default class CalendarView extends React.Component {
   }
 
   _renderRowView(rowData) {
+    const format = Platform.OS === 'ios' ? 'LL' : 'll';
     return (
       <TouchableHighlight
         style={styles.row}
@@ -96,7 +97,7 @@ export default class CalendarView extends React.Component {
         onPress={() => Actions.editHistory(rowData)}
       >
         <View>
-          <Text style={styles.historyText}>{moment(rowData.date).format('MMM D, YYYY')} - {moment(rowData.date).add(rowData.length, 'day').format('MMM D, YYYY')}</Text>
+          <Text style={styles.historyText}>{moment(rowData.date).format(format)} - {moment(rowData.date).add(rowData.length, 'day').format(format)}</Text>
           <Text style={styles.historyText}>Length: {rowData.length}</Text>
         </View>
       </TouchableHighlight>

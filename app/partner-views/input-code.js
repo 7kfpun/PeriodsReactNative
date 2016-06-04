@@ -69,7 +69,7 @@ export default class QRCodeReaderView extends React.Component {
 
   onActionSelected(position) {
     if (position === 0) {  // index of 'Back'
-      this.save();
+      Actions.selectGender();
     }
   }
 
@@ -85,6 +85,8 @@ export default class QRCodeReaderView extends React.Component {
     } else if (Platform.OS === 'android') {
       return (
         <Icon.ToolbarAndroid
+          navIconName="arrow-back"
+          onIconClicked={Actions.pop}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -157,6 +159,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginBottom: 20,
+    borderWidth: 0,
     borderRadius: 0,
     backgroundColor: '#9E9E9E',
   },

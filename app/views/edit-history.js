@@ -91,6 +91,7 @@ export default class EditHistoryView extends React.Component {
   }
 
   render() {
+    const format = Platform.OS === 'ios' ? 'LL' : 'll';
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
@@ -99,7 +100,7 @@ export default class EditHistoryView extends React.Component {
             <Section header="PERIOD STARTS">
               <Cell cellstyle="Basic"
                 onPress={() => this.showDatePicker()}
-                title={this.state.date && moment(this.state.date).format('MMM Do YY')}
+                title={this.state.date && moment(this.state.date).format(format)}
               />
             </Section>
 

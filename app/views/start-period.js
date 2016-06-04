@@ -90,6 +90,7 @@ export default class StartPeriodView extends React.Component {
   }
 
   render() {
+    const format = Platform.OS === 'ios' ? 'LL' : 'll';
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
@@ -98,7 +99,7 @@ export default class StartPeriodView extends React.Component {
             <Section header="PERIOD STARTS">
               <Cell cellstyle="Basic"  onPress={()=>this.showDatePicker()}
                 title={
-                this.state.date && moment(this.state.date).format('MMM Do YY')
+                this.state.date && moment(this.state.date).format(format)
               } />
             </Section>
           </TableView>

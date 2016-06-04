@@ -81,7 +81,7 @@ export default class PeriodLengthSettingsView extends React.Component {
                   style={sliderStyles.container}
                   trackStyle={sliderStyles.track}
                   thumbStyle={sliderStyles.thumb}
-                  minimumTrackTintColor="#31a4db"
+                  minimumTrackTintColor="#31A4DB"
                   thumbTouchSize={{width: 50, height: 40}}
                   value={Number(this.state.value)}
                   onValueChange={(value) => this.setState({value})}

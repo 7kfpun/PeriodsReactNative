@@ -93,6 +93,7 @@ export default class EndPeriodView extends React.Component {
   }
 
   render() {
+    const format = Platform.OS === 'ios' ? 'LL' : 'll';
     return (
       <View style={styles.container}>
         {this.renderToolbar()}
@@ -101,7 +102,8 @@ export default class EndPeriodView extends React.Component {
             <Section header="PERIOD ENDS">
               <Cell cellstyle="Basic"
                 onPress={()=>this.showDatePicker()}
-                title={this.props.date && moment(this.props.date).add(this.state.settings.PERIOD_LENGTH.VALUE, 'days').format('MMM Do YY') || this.state.date && moment(this.state.date).format('MMM Do YY')}
+                title={this.props.date && moment(this.props.date).add(this.state.settings.PERIOD_LENGTH.VALUE, 'days').format(format)
+                  || this.state.date && moment(this.state.date).format(format)}
               />
             </Section>
           </TableView>
