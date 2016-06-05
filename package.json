@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "build-android": "npm run release-android; osascript -e 'display notification \"DONE!\" with title \"Android built\"'",
+    "bundle-android": "$NVM_BIN/react-native bundle --platform android --dev false --entry-file ./index.android.js --bundle-output android/app/src/main/assets/index.android.bundle # --assets-dest android/app/src/main/res/",
+    "release-android": "cd android && ./gradlew assembleRelease && cd .."
   },
   "dependencies": {
     "alt": "^0.18.4",
@@ -13,9 +16,11 @@
     "react": "^15.0.2",
     "react-native": "^0.26.2",
     "react-native-admob": "^1.0.0",
+    "react-native-animatable": "^0.6.1",
     "react-native-barcode-scanner-universal": "^1.0.5",
     "react-native-camera": "git://github.com/lwansbrough/react-native-camera",
     "react-native-datetime": "git://github.com/7kfpun/react-native-datetime",
+    "react-native-device-info": "^0.9.3",
     "react-native-gifted-listview": "0.0.15",
     "react-native-navbar": "^1.5.0",
     "react-native-qrcode": "^0.2.2",
