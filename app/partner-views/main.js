@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Platform,
   StyleSheet,
   Text,
@@ -9,6 +10,7 @@ import {
 import Firebase from 'firebase';
 
 // 3rd party libraries
+import { Actions } from 'react-native-router-flux';
 import { AdMobBanner } from 'react-native-admob';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
@@ -23,7 +25,9 @@ export default class DemoReactNative extends React.Component {
     super(props);
 
     this.state = {
+      partner: {},
       periods: [],
+      settings: {},
     };
   }
 
@@ -51,30 +55,73 @@ export default class DemoReactNative extends React.Component {
       });
     });
 
-    store.get('partnerUuid').then((partnerUuid) => {
-      if (partnerUuid) {
-        this.setState({partnerUuid: partnerUuid});
-        this.firebaseRef.child('users').child(partnerUuid).on('value', (snapshot) => {
-          console.log('check', snapshot.val());
-          let values = snapshot.val();
-          if (values !== null) {
-            store.save('periods', values.periods);
-            store.save('settings', values.settings);
-            that.setState({
-              partnerUuid: partnerUuid,
-              periods: values.periods,
-              settings: values.settings,
-              key: Math.random(),
-            });
-            that.updateStatistics();
-          }
-        });
-      }
+    store.get('uuid').then((uuid) => {
+      store.get('partnerUuid').then((partnerUuid) => {
+        if (uuid && partnerUuid) {
+          that.firebaseRef.child('partners').child(partnerUuid).child(uuid).on('value', (snapshot) => {
+            let values = snapshot.val();
+            if (values !== null) {
+              console.log('ISLINKING', values);
+            } else {
+              Alert.alert(
+                'Linking is disabled',
+                '',
+                [
+                  {text: 'OK', onPress: () => console.log('OK')},
+                ]
+              );
+              store.delete('gender');
+              store.delete('partnerUuid');
+              store.delete('periods');
+              store.delete('settings');
+              Actions.selectGender();
+            }
+          });
+
+          that.setState({partnerUuid: partnerUuid});
+
+          that.firebaseRef.child('users').child(partnerUuid).on('value', (snapshot) => {
+            console.log('Firebase get users', snapshot.val());
+            let values = snapshot.val();
+            if (values !== null) {
+              that.setState({
+                partner: values,
+              });
+            }
+          });
+
+          that.firebaseRef.child('periods').child(partnerUuid).on('value', (snapshot) => {
+            console.log('Firebase get periods', snapshot.val());
+            let values = snapshot.val();
+            if (values !== null) {
+              store.save('periods', values);
+              that.setState({
+                periods: values,
+                key: Math.random(),
+              });
+              that.updateStatistics();
+            }
+          });
+
+          that.firebaseRef.child('settings').child(partnerUuid).on('value', (snapshot) => {
+            console.log('Firebase get settings', snapshot.val());
+            let values = snapshot.val();
+            if (values !== null) {
+              store.save('settings', values);
+              that.setState({
+                settings: values,
+                key: Math.random(),
+              });
+              that.updateStatistics();
+            }
+          });
+        }
+      });
     });
   }
 
   updateStatistics() {
-    if (this.state.periods.length > 0) {
+    if (this.state.periods.length > 0 && this.state.settings.CYCLE_LENGTH && this.state.settings.OVULATION_FERTILE) {
       if (this.state.periods.filter((item) => item.length === undefined).length === 1) {
         let startedPeriod = this.state.periods.filter((item) => item.length === undefined)[0];
         this.setState({
@@ -138,8 +185,7 @@ export default class DemoReactNative extends React.Component {
       <View style={styles.container}>
         {this.renderToolbar()}
         <View style={styles.partnerBlock}>
-          <Text style={styles.headerText}>{'You are linking to'}</Text>
-          <Text style={styles.headerText}>{this.state.partnerUuid}</Text>
+          <Text style={styles.headerText}>{'You are linking to ' + this.state.partner.name}</Text>
         </View>
         <View style={styles.predictionBlock}>
           <View style={styles.dayLeftheader}>

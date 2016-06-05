@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  BackAndroid,
   Platform,
   StyleSheet,
   Text,
@@ -8,25 +7,31 @@ import {
 } from 'react-native';
 
 // Flux
+import PeriodActions from '../actions/period-actions';
 import PeriodStore from '../stores/period-store';
 import SettingStore from '../stores/setting-store';
+
+import moment from 'moment';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import { AdMobBanner } from 'react-native-admob';
 import Button from 'apsl-react-native-button';
+import DateTimePicker from 'react-native-datetime';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
-import moment from 'moment';
+import Toast from 'react-native-root-toast';
 
-import {getOrdinal} from '../utils/get-ordinal';
-import {config} from '../config';
+import { config } from '../config';
+import { getOrdinal } from '../utils/get-ordinal';
 
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign({}, PeriodStore.getState(), SettingStore.getState());
+    this.state = Object.assign({
+      date: new Date(),
+    }, PeriodStore.getState(), SettingStore.getState());
   }
 
   componentDidMount() {
@@ -84,6 +89,58 @@ export default class Main extends React.Component {
     this.updateStatistics();
   }
 
+  showDatePicker() {
+    var date = this.state.date;
+    this.refs.picker.showDatePicker(date, (d) => {
+      if (moment().diff(d) < 0) {
+        Toast.show('The date input should be before today.', {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+      } else {
+        PeriodActions.addPeriod({
+          date: d,
+          // event: 'PERIOD',
+        });
+      }
+    });
+  }
+
+  render_prediction_block() {
+    if (this.state.periods && this.state.periods.length > 0) {
+      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
+        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
+          {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
+          {this.state.daysLeft !== null &&  this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
+          {this.state.daysOfPeriod !== null && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{getOrdinal(this.state.daysOfPeriod + 1)}</Text>{' DAY OF PERIOD'}</Text>}
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
+          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
+        </View>
+
+        <View>
+          {!this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={() => this.showDatePicker()} >
+            {'Period Starts'}
+          </Button>}
+          {this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={() => Actions.endPeriod({date: this.state.startedPeriod.date})} >
+            {'Period Ends'}
+          </Button>}
+        </View>
+      </View>;
+    } else {
+      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
+        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
+          <Text style={styles.headerText}>Please enter your period.</Text>
+        </View>
+
+        <View>
+          <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={() => this.showDatePicker()} >
+            {'Period Starts'}
+          </Button>
+        </View>
+      </View>;
+    }
+  }
+
   onActionSelected(position) {
     if (position === 0) {  // index of 'Settings'
       Actions.settings();
@@ -115,41 +172,6 @@ export default class Main extends React.Component {
     }
   }
 
-  render_prediction_block() {
-    if (this.state.periods && this.state.periods.length > 0) {
-      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
-        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
-          {this.state.daysLeft !== null &&  this.state.daysLeft >= 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{this.state.daysLeft}</Text>{' DAYS LEFT'}</Text>}
-          {this.state.daysLeft !== null &&  this.state.daysLeft < 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{Math.abs(this.state.daysLeft)}</Text>{' DAYS LATE'}</Text>}
-          {this.state.daysOfPeriod !== null && this.state.daysOfPeriod !== 0 && <Text style={styles.headerText}><Text style={{fontSize: 40}}>{getOrdinal(this.state.daysOfPeriod + 1)}</Text>{' DAY OF PERIOD'}</Text>}
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextPeriod}</Text>{' Next Period'}</Text>
-          <Text style={styles.subHeaderText}><Text style={{fontSize: 20}}>{this.state.nextFertile}</Text>{' Next Fertile'}</Text>
-        </View>
-
-        <View>
-          {!this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.startPeriod} >
-            {'Period Starts'}
-          </Button>}
-          {this.state.isStarted && <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={() => Actions.endPeriod({date: this.state.startedPeriod.date})} >
-            {'Period Ends'}
-          </Button>}
-        </View>
-      </View>;
-    } else {
-      return <View style={[styles.block, {flex: 2, marginTop: 10, alignItems: 'center'}]}>
-        <View style={[styles.dayLeftheader, {alignItems: 'center'}]}>
-          <Text style={styles.headerText}>Please enter your period.</Text>
-        </View>
-
-        <View>
-          <Button style={styles.button} textStyle={{color: 'white', fontSize: 18}} onPress={Actions.startPeriod} >
-            {'Period Starts'}
-          </Button>
-        </View>
-      </View>;
-    }
-  }
-
   render() {
     return (
       <View style={styles.container}>
@@ -160,6 +182,8 @@ export default class Main extends React.Component {
 
         {Platform.OS === 'android' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.android} />}
         {Platform.OS === 'ios' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.ios} />}
+
+        <DateTimePicker isTopUp={true} cancelText={'Cancel'} okText={'OK'} ref={'picker'} />
       </View>
     );
   }

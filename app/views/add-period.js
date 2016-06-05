@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -7,22 +8,21 @@ import {
   View,
 } from 'react-native';
 
+import moment from 'moment';
+
 // Flux
 import PeriodActions from '../actions/period-actions';
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
-import {
-  Cell,
-  Section,
-  TableView,
-} from 'react-native-tableview-simple';
+import { AdMobBanner } from 'react-native-admob';
+import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import DateTimePicker from 'react-native-datetime';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import Slider from 'react-native-slider';
 
-import moment from 'moment';
+import { config } from '../config';
 
 export default class AddPeriodView extends React.Component {
   constructor(props) {
@@ -36,9 +36,16 @@ export default class AddPeriodView extends React.Component {
 
   showDatePicker() {
     var date = this.state.date;
-    this.picker.showDatePicker(date, (d) => {
+    this.refs.picker.showDatePicker(date, (d) => {
       if (moment().diff(d) < 0) {
         this.setState({date: new Date()});
+        Alert.alert(
+          'The date input should be before today.',
+          '',
+          [
+            {text: 'OK', onPress:() => console.log()},
+          ]
+        );
       } else {
         this.setState({date: d});
       }
@@ -50,7 +57,7 @@ export default class AddPeriodView extends React.Component {
     PeriodActions.addPeriod({
       date: this.state.date,
       length: this.state.length,
-      event: 'PERIOD',
+      // event: 'PERIOD',
     });
     Actions.pop();
   }
@@ -123,7 +130,10 @@ export default class AddPeriodView extends React.Component {
           </TableView>
         </ScrollView>
 
-        <DateTimePicker cancelText="Cancel" okText="OK" ref={(picker)=> {this.picker = picker;}} />
+        {Platform.OS === 'android' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.android} />}
+        {Platform.OS === 'ios' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.ios} />}
+
+        <DateTimePicker cancelText={'Cancel'} okText={'OK'} ref={'picker'} />
       </View>
     );
   }

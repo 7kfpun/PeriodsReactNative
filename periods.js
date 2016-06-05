@@ -13,7 +13,13 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import store from 'react-native-simple-store';
 
-import SelectGenderView from './app/views/select-gender';
+import SelectGenderView from './app/pre-views/select-gender';
+
+import LastPeriodView from './app/pre-views/last-period';
+
+import QRCodeReaderView from './app/pre-views/qrcode-reader';
+import InputCodeView from './app/pre-views/input-code';
+import InputNameView from './app/pre-views/input-name';
 
 import Main from './app/views/main';
 import CalendarView from './app/views/calendar';
@@ -31,8 +37,6 @@ import OvulationFertileSettingsView from './app/views/settings/ovulation-fertile
 
 import LinkView from './app/views/link';
 
-import QRCodeReaderView from './app/partner-views/qrcode-reader';
-import InputCodeView from './app/partner-views/input-code';
 import MainMaleView from './app/partner-views/main';
 import HistoryMaleView from './app/partner-views/history';
 import SettingsMaleView from './app/partner-views/settings';
@@ -100,8 +104,11 @@ const scenes = Actions.create(
     <Scene key="cycleLengthSettings" title="Cycle Length" component={CycleLengthSettingsView} />
     <Scene key="ovulationFertileSettings" title="Ovulation and Fertile" component={OvulationFertileSettingsView} />
 
+    <Scene key="lastPeriod" title="Your last period" component={LastPeriodView}  type="reset" />
+
     <Scene key="qrcodeReader" title="QR Code Reader" component={QRCodeReaderView}  type="reset" />
     <Scene key="inputCode" title="Input code" component={InputCodeView} />
+    <Scene key="inputName" title="Input name" component={InputNameView} />
 
     <Scene key="mainMale" component={NavigationDrawer} type="reset">
       <Scene key="tabbarMale" tabs={true}>

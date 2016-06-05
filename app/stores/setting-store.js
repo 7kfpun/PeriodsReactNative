@@ -39,7 +39,7 @@ class SettingStore {
       if (isLinkingEnabled) {
         store.get('uuid').then((uuid) => {
           let firebaseRef = new Firebase(config.firebaseHost);
-          firebaseRef.child('users').child(uuid).update({settings: settings});
+          firebaseRef.child('settings').child(uuid).set(settings);
           firebaseRef.off();
         });
       }

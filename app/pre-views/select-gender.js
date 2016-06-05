@@ -8,8 +8,8 @@ import {
 
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
+import * as Animatable from 'react-native-animatable';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import store from 'react-native-simple-store';
 
 export default class SelectGenderView extends React.Component {
   constructor(props) {
@@ -17,8 +17,7 @@ export default class SelectGenderView extends React.Component {
   }
 
   selectFemale() {
-    Actions.main();
-    store.save('gender', 'female');
+    Actions.lastPeriod();
   }
 
   selectMale() {
@@ -31,13 +30,21 @@ export default class SelectGenderView extends React.Component {
         <TouchableHighlight style={{flex: 1}} onPress={() => this.selectFemale()}>
           <View style={styles.leftContainer}>
             <FontAwesomeIcon name="female" size={40} color="white"  />
-            <Text style={styles.text}>Female</Text>
+            <Animatable.Text
+              animation="pulse"
+              iterationCount="infinite"
+              direction="normal"
+              style={styles.text}>Female</Animatable.Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight style={{flex: 1}} onPress={() => this.selectMale()}>
           <View style={styles.rightContainer}>
             <FontAwesomeIcon name="male" size={40} color="white" />
-            <Text style={styles.text}>Male</Text>
+            <Animatable.Text
+              animation="pulse"
+              iterationCount="infinite"
+              direction="alternate"
+              style={styles.text}>Male</Animatable.Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -64,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3F51B5',
   },
   text: {
-    marginTop: 10,
+    marginTop: 25,
     fontSize: 18,
     color: 'white',
   },

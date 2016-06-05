@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Platform,
   StyleSheet,
   TextInput,
@@ -11,22 +12,20 @@ import Firebase from 'firebase';
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import Button from 'apsl-react-native-button';
+import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import Toast from 'react-native-root-toast';
 import store from 'react-native-simple-store';
 
-import moment from 'moment';
-
 import { config } from '../config';
-import { guid } from '../utils/guid';
 
-export default class QRCodeReaderView extends React.Component {
+export default class InputNameView extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      value: this.props.value,
+      value: DeviceInfo.getDeviceName(),
     };
   }
 
@@ -38,38 +37,34 @@ export default class QRCodeReaderView extends React.Component {
     this.firebaseRef.off();
   }
 
-  connect(linkingToken) {
-    var that = this;
-    console.log('linkingToken', linkingToken);
-    this.firebaseRef.child('users').orderByChild('linkingToken/token').equalTo(linkingToken).once('value', function(snapshot) {
-      if (snapshot.val()) {
-        var keys = Object.keys(snapshot.val());
-        if (keys.length > 0) {
-          var uuid = guid();
-          store.save('uuid', uuid);
-          store.save('gender', 'male');
-          var partnerUuid = keys[0];
-          console.log('partnerUuid', partnerUuid);
-          store.save('partnerUuid', partnerUuid);
-          that.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).set({
-            uuid: uuid,
-            gender: 'male',
-            linkedDate: moment().format(),
-          });
+  addName(name) {
+    if (name) {
+      var that = this;
+      store.get('uuid').then((uuid) => {
+        that.firebaseRef.child('users').child(uuid).update({
+          name: name,
+        });
+      });
 
-          Toast.show('Nice! You have linked the calendar with your partnar.', {
-            duration: Toast.durations.SHORT,
-            position: Toast.positions.BOTTOM,
-            onHidden: Actions.mainMale,
-          });
-        }
-      }
-    });
+      Toast.show('Nice! You have linked the calendar with your partnar.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+        onHidden: Actions.mainMale,
+      });
+    } else {
+      Alert.alert(
+        'Please input your name.',
+        '',
+        [
+          {text: 'OK', onPress:() => console.log()},
+        ]
+      );
+    }
   }
 
   onActionSelected(position) {
     if (position === 0) {  // index of 'Back'
-      Actions.selectGender();
+      Actions.mainMale();
     }
   }
 
@@ -79,7 +74,7 @@ export default class QRCodeReaderView extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={Actions.pop} />}
+          rightButton={{title: 'Skip', handler: Actions.mainMale}}
         />
       );
     } else if (Platform.OS === 'android') {
@@ -91,7 +86,7 @@ export default class QRCodeReaderView extends React.Component {
           title={this.props.title}
           titleColor="white"
           actions={[
-            {title: 'Cancel', iconName: 'close', iconSize: 26, show: 'always'},
+            {title: 'Skip', show: 'always'},
           ]}
           onActionSelected={(position) => this.onActionSelected(position)}
         />
@@ -109,12 +104,11 @@ export default class QRCodeReaderView extends React.Component {
               style={styles.input}
               onChangeText={(value) => this.setState({value})}
               value={this.state.value}
-              keyboardType="number-pad"
-              placeholder={'Or input the CODE here'}
+              placeholder={'Inout your name here'}
               placeholderTextColor="#9E9E9E"
             />
-            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => this.connect(this.state.value)} >
-              {'Connect'}
+            <Button style={styles.button} textStyle={{fontSize: 18, color: 'white'}} onPress={() => this.addName(this.state.value)} >
+              {'Add name'}
             </Button>
           </View>
         </View>

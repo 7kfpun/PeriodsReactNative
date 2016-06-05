@@ -15,6 +15,7 @@ import Firebase from 'firebase';
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import { Cell, CustomCell,Section, TableView } from 'react-native-tableview-simple';
+import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
@@ -50,9 +51,7 @@ export default class SettingsView extends React.Component {
           store.get('uuid').then((uuid) => {
             store.get('partnerUuid').then((partnerUuid) => {
               if (uuid && partnerUuid) {
-                this.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).remove();
-                AsyncStorage.clear();
-                Actions.selectGender();
+                this.firebaseRef.child('partners').child(partnerUuid).child(uuid).remove();
               }
             });
           });
@@ -110,6 +109,14 @@ export default class SettingsView extends React.Component {
 
             <Section header="LINK">
               <Cell cellstyle="Basic" title="Remove Linking" onPress={() => this.disconnect()} />
+            </Section>
+
+            <Section>
+              <Cell
+                cellstyle="RightDetail"
+                title="Version"
+                detail={DeviceInfo.getVersion() + '(' + DeviceInfo.getBuildNumber() + ')'}
+              />
             </Section>
 
             <Section header="DEVELOPMENT">

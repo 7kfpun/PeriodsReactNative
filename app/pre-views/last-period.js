@@ -8,36 +8,33 @@ import {
   View,
 } from 'react-native';
 
+import moment from 'moment';
+
 // Flux
 import PeriodActions from '../actions/period-actions';
 
-import moment from 'moment';
-
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
-import { AdMobBanner } from 'react-native-admob';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import DateTimePicker from 'react-native-datetime';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import Slider from 'react-native-slider';
+import store from 'react-native-simple-store';
 
-import { config } from '../config';
-
-export default class EditHistoryView extends React.Component {
+export default class AddPeriodView extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      date: new Date(this.props.date),
-      length: this.props.length,
+      date: this.props.date || new Date(),
+      length: 3,
     };
     this.picker = null;
   }
 
   showDatePicker() {
     var date = this.state.date;
-    this.refs.picker.showDatePicker(date, (d)=>{
+    this.refs.picker.showDatePicker(date, (d) => {
       if (moment().diff(d) < 0) {
         this.setState({date: new Date()});
         Alert.alert(
@@ -55,20 +52,13 @@ export default class EditHistoryView extends React.Component {
 
   save() {
     console.log('Save');
-    PeriodActions.editPeriod({
-      uuid: this.props.uuid,
+    PeriodActions.addPeriod({
       date: this.state.date,
       length: this.state.length,
-      type: 'PERIOD',
     });
-    Actions.pop();
-  }
 
-  delete() {
-    PeriodActions.deletePeriod({
-      uuid: this.props.uuid,
-    });
-    Actions.pop();
+    store.save('gender', 'female');
+    Actions.main();
   }
 
   onActionSelected(position) {
@@ -84,7 +74,7 @@ export default class EditHistoryView extends React.Component {
           statusBar={{tintColor: '#EF5350', style: 'light-content'}}
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={() => Actions.pop()} />}
+          leftButton={<Icon style={styles.navigatorLeftButton} name="arrow-back" size={26} color="white" onPress={Actions.selectGender} />}
           rightButton={<Icon style={styles.navigatorRightButton} name="check" size={26} color="white" onPress={() => this.save()} />}
         />
       );
@@ -92,7 +82,7 @@ export default class EditHistoryView extends React.Component {
       return (
         <Icon.ToolbarAndroid
           navIconName="arrow-back"
-          onIconClicked={Actions.pop}
+          onIconClicked={Actions.selectGender}
           style={styles.toolbar}
           title={this.props.title}
           titleColor="white"
@@ -114,7 +104,7 @@ export default class EditHistoryView extends React.Component {
           <TableView>
             <Section header="PERIOD STARTS">
               <Cell cellstyle="Basic"
-                onPress={() => this.showDatePicker()}
+                onPress={()=>this.showDatePicker()}
                 title={this.state.date && moment(this.state.date).format(format)}
               />
             </Section>
@@ -136,16 +126,8 @@ export default class EditHistoryView extends React.Component {
               </View>
               <Text style={{marginLeft: 20}}>Value: {this.state.length}</Text>
             </Section>
-
-            <Section>
-              <Cell style={{backgroundColor: 'gray'}} cellstyle="Basic"  onPress={() => this.delete()}
-                title={"DELETE"} />
-            </Section>
           </TableView>
         </ScrollView>
-
-        {Platform.OS === 'android' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.android} />}
-        {Platform.OS === 'ios' && <AdMobBanner bannerSize={'smartBannerPortrait'} adUnitID={config.adUnitID.ios} />}
 
         <DateTimePicker cancelText={'Cancel'} okText={'OK'} ref={'picker'} />
       </View>
@@ -179,7 +161,7 @@ const sliderStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EFEFF4',
+    backgroundColor: '#EF5350',
   },
   navigatorBarIOS: {
     backgroundColor: '#EF5350',

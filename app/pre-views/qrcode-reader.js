@@ -19,7 +19,7 @@ import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
-// import Toast from 'react-native-root-toast';
+import Toast from 'react-native-root-toast';
 
 import { config } from '../config';
 import { guid } from '../utils/guid';
@@ -81,20 +81,16 @@ export default class QRCodeReaderView extends React.Component {
             store.save('uuid', uuid);
             store.save('gender', 'male');
             var partnerUuid = keys[0];
-            console.log('partnerUuid', partnerUuid);
             store.save('partnerUuid', partnerUuid);
-            that.firebaseRef.child('users').child(partnerUuid).child('partners').child(uuid).set({
-              uuid: uuid,
-              gender: 'male',
+            that.firebaseRef.child('users').child(uuid).update({
+              gender: 'MALE',
+            });
+
+            that.firebaseRef.child('partners').child(partnerUuid).child(uuid).update({
               linkedDate: moment().format(),
             });
 
-            Actions.mainMale();
-            // Toast.show('Nice! You have linked the calendar with your partnar.', {
-            //   duration: Toast.durations.SHORT,
-            //   position: Toast.positions.BOTTOM,
-            //   onHidden: Actions.mainMale,
-            // });
+            Actions.inputName();
           }
         }
       });
@@ -114,7 +110,7 @@ export default class QRCodeReaderView extends React.Component {
         <NavigationBar
           style={styles.navigatorBarIOS}
           title={{title: this.props.title, tintColor: 'white'}}
-          rightButton={<Icon style={styles.navigatorRightButton} name="close" size={26} color="white" onPress={() => {Actions.selectGender(); store.delete('gender');}} />}
+          rightButton={<Icon style={styles.navigatorRightButton} name="close" size={26} color="white" onPress={Actions.selectGender} />}
         />
       );
     } else if (Platform.OS === 'android') {

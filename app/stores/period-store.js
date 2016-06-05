@@ -35,19 +35,21 @@ class PeriodStore {
   }
 
   sortPeriod() {
-    this.periods.sort(function(a,b){
+    this.periods.sort(function(a,b) {
       return new Date(b.date) - new Date(a.date);
     });
   }
 
   save(periods) {
+    this.sortPeriod();
     store.save('periods', periods);
 
     store.get('isLinkingEnabled').then((isLinkingEnabled) => {
       if (isLinkingEnabled) {
         store.get('uuid').then((uuid) => {
           let firebaseRef = new Firebase(config.firebaseHost);
-          firebaseRef.child('users').child(uuid).update({periods: periods});
+          // firebaseRef.child('periods').child(uuid).remove();
+          firebaseRef.child('periods').child(uuid).set(periods);
           firebaseRef.off();
         });
       }
@@ -57,17 +59,17 @@ class PeriodStore {
   handleAddPeriod(period) {
     console.log('handleAddPeriod', period);
     period.uuid = guid();
+    period.date = period.date.toISOString();
     period.event = 'PERIOD';
     this.periods.push(period);
-    this.sortPeriod();
     this.save(this.periods);
   }
 
   handleStartPeriod(period) {
     console.log('handleStartPeriod', period);
     period.uuid = guid();
+    period.date = period.date.toISOString();
     this.periods.push(period);
-    this.sortPeriod();
     this.save(this.periods);
   }
 
@@ -76,17 +78,14 @@ class PeriodStore {
     let p = this.periods.filter((item) => item.length === undefined)[0];
     let length = moment(period.date).diff(moment(p.date), 'days');
     p.length = length;
-    this.sortPeriod();
     this.save(this.periods);
   }
 
   handleEditPeriod(period) {
     console.log('handleEditPeriod', period);
     let p = this.periods.filter((item) => item.uuid === period.uuid)[0];
-    p.date = period.date;
+    p.date = period.date.toISOString();
     p.length = period.length;
-    p.event = period.event;
-    this.sortPeriod();
     this.save(this.periods);
   }
 
@@ -94,7 +93,6 @@ class PeriodStore {
     console.log('handleDeletePeriod', period);
     let p = this.periods.filter((item) => item.uuid !== period.uuid);
     this.periods = p;
-    this.sortPeriod();
     this.save(this.periods);
   }
 }

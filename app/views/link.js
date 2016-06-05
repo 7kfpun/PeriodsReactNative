@@ -16,9 +16,9 @@ import moment from 'moment';
 
 // 3rd party libraries
 import { Cell, CustomCell, Section, TableView } from 'react-native-tableview-simple';
-import Button from 'apsl-react-native-button';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import DeviceInfo from 'react-native-device-info';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import QRCode from 'react-native-qrcode';
 import Share from 'react-native-share';
@@ -36,6 +36,7 @@ export default class LinkView extends React.Component {
 
     this.state = {
       isLinkingEnabled: false,
+      linkingToken: {},
       uuid: '',
       partners: null,
     };
@@ -46,30 +47,7 @@ export default class LinkView extends React.Component {
   }
 
   componentDidMount() {
-    let that = this;
-    store.get('isLinkingEnabled').then((isLinkingEnabled) => {
-      store.get('uuid').then((uuid) => {
-        store.get('partners').then((partners) => {
-          store.get('linkingToken').then((linkingToken) => {
-            if (isLinkingEnabled) {
-              that.setState({
-                uuid: uuid,
-                partners: partners,
-                isLinkingEnabled: true,
-                linkingToken: linkingToken,
-              });
-
-              that.firebaseRef.child('users').child(uuid).child('partners').on('value', (snapshot) => {
-                console.log('partners', snapshot.val());
-                partners = snapshot.val() || {};
-                that.setState({partners: partners});
-                store.save('partners', partners);
-              });
-            }
-          });
-        });
-      });
-    });
+    this.getPartners();
   }
 
   componentWillUnmount() {
@@ -84,30 +62,21 @@ export default class LinkView extends React.Component {
         [
           {text: 'Cancel', onPress: () => this.setState({isLinkingEnabled: false})},
           {text: 'OK', onPress: () => {
-            let uuid = guid();
-            let linkingToken = {
-              token: token(),
-              expiredDate: moment().add(1, 'day').format(),
-            };
             this.setState({
               isLinkingEnabled: value,
-              uuid: uuid,
-              linkingToken: linkingToken,
-              key: Math.random(),
             });
-            store.save('isLinkingEnabled', value);
-            store.save('uuid', uuid);
-            store.save('linkingToken', linkingToken);
 
+            let uuid = guid();
             let that = this;
-            store.get('periods').then((periods) => {
-              store.get('settings').then((settings) => {
-                console.log('linkingToken', linkingToken);
-                that.firebaseRef.child('users').child(uuid).update({
-                  isLinkingEnabled: true,
-                  linkingToken: linkingToken,
-                  periods: periods,
-                  settings: settings,
+            store.save('isLinkingEnabled', value);
+            store.save('uuid', uuid).then(() => {
+              that.updateToken();
+              that.getPartners();
+
+              store.get('periods').then((periods) => {
+                store.get('settings').then((settings) => {
+                  that.firebaseRef.child('periods').child(uuid).set(periods);
+                  that.firebaseRef.child('settings').child(uuid).set(settings);
                 });
               });
             });
@@ -123,13 +92,19 @@ export default class LinkView extends React.Component {
           {text: 'OK', onPress: () => {
             this.setState({
               isLinkingEnabled: value,
-              uuid: null,
             });
+
             let that = this;
-            store.get('uuid').then((uuid) => that.firebaseRef.child('users').child(uuid).remove());
+            store.get('uuid').then((uuid) => {
+              that.firebaseRef.child('users').child(uuid).remove();
+              that.firebaseRef.child('partners').child(uuid).remove();
+              that.firebaseRef.child('periods').child(uuid).remove();
+              that.firebaseRef.child('settings').child(uuid).remove();
+            });
             store.delete('isLinkingEnabled');
             store.delete('uuid');
             store.delete('linkingToken');
+            store.delete('expiredDate');
           }}
         ]
       );
@@ -137,24 +112,61 @@ export default class LinkView extends React.Component {
   }
 
   updateToken() {
-    let linkingToken = {
-      token: token(),
-      expiredDate: moment().add(1, 'day').format(),
-    };
-    this.setState({
-      linkingToken: linkingToken,
-      key: Math.random(),
-    });
-    store.save('linkingToken', linkingToken);
-
     let that = this;
     store.get('uuid').then((uuid) => {
-      that.firebaseRef.child('users').child(uuid).update({
+      let linkingToken = {
+        token: token(),
+        expiredDate: moment().add(1, 'day').format(),
+      };
+
+      this.setState({
         linkingToken: linkingToken,
+        key: Math.random(),
       });
+      store.save('linkingToken', linkingToken);
+
+      that.firebaseRef.child('users').child(uuid).update({
+        gender: 'FEMALE',
+        linkingToken: linkingToken,
+        name: DeviceInfo.getDeviceName(),
+      });
+
     });
   }
 
+  getPartners() {
+    let that = this;
+    store.get('isLinkingEnabled').then((isLinkingEnabled) => {
+      store.get('uuid').then((uuid) => {
+        store.get('partners').then((partners) => {
+          store.get('linkingToken').then((linkingToken) => {
+            if (isLinkingEnabled) {
+              that.setState({
+                uuid: uuid,
+                partners: partners,
+                isLinkingEnabled: true,
+                linkingToken: linkingToken,
+              });
+
+              that.firebaseRef.child('partners').child(uuid).on('value', (snapshot) => {
+                console.log('partners', snapshot.val());
+                partners = snapshot.val() || {};
+                that.setState({partners: partners});
+                Object.keys(partners).forEach((partner) => {
+                  that.firebaseRef.child('users').child(partner).once('value', (snapshot1) => {
+                    console.log('snapshotsnapshot1', snapshot1.val());
+                    partners[partner] = snapshot1.val();
+                    that.setState({partners: partners});
+                  });
+                });
+                store.save('partners', partners);
+              });
+            }
+          });
+        });
+      });
+    });
+  }
   removeLink(linkedUuid) {
     Alert.alert(
       'Delete linking',
@@ -164,7 +176,7 @@ export default class LinkView extends React.Component {
         {text: 'OK', onPress: () => {
           console.log(linkedUuid);
           store.get('uuid').then((uuid) => {
-            this.firebaseRef.child('users').child(uuid).child('partners').child(linkedUuid).remove();
+            this.firebaseRef.child('partners').child(uuid).child(linkedUuid).remove();
           });
         }},
       ]
@@ -226,44 +238,48 @@ export default class LinkView extends React.Component {
         {this.renderToolbar()}
         <ScrollView>
           <TableView>
-            <Section header="LINKING" footer={this.state.linkingToken && this.state.linkingToken.token + ' ' + this.state.linkingToken.expiredDate}>
+            <Section header="LINKING" footer="Scan QR code or input the code in your partner device to pair calendar.">
               <CustomCell>
                 <Text style={{flex: 1, fontSize: 16, color: 'black'}}>Enable</Text>
                 <Switch
                   onValueChange={(value) => this.enableLinking(value)}
                   value={this.state.isLinkingEnabled} />
               </CustomCell>
+
+              <Cell cellstyle="RightDetail" title="Name" detail={DeviceInfo.getDeviceName()} />
+
+              <CustomCell>
+                <Text style={{flex: 1, fontSize: 16, color: 'black'}}>Token</Text>
+                <Text style={{alignItems: 'flex-end', fontSize: 16, color: '#424242'}}>{this.state.linkingToken.token}</Text>
+                <Icon style={{alignItems: 'flex-end'}} name="refresh" size={20} color="#1565C0" onPress={() => this.updateToken()} />
+              </CustomCell>
+
               {this.state.isLinkingEnabled
-                && this.state.linkingToken
                 && <View style={{backgroundColor: 'white'}}>
                     <TouchableOpacity style={styles.qrBlock} onPress={() => this.share()}>
                       <View>
-                        <Button style={styles.button} textStyle={{fontSize: 18, color: '#121212'}} onPress={() => this.updateToken()} >
-                          {this.state.linkingToken.token}
-                          <Icon name="refresh" size={20} color="#121212" />
-                        </Button>
-
                         <QRCode
                           key={this.state.key}
                           value={this.state.linkingToken.token}
-                          size={WIDTH - 100}
+                          size={WIDTH - 80}
                           bgColor="purple"
                           fgColor="white"
                         />
                       </View>
                     </TouchableOpacity>
-                    <Text style={{margin: 20, textAlign: 'center'}}>Ask your partner to scan the QR code or share it to your partnar</Text>
                   </View>
                 }
             </Section>
-            {this.state.isLinkingEnabled && <Section header="LINKED DEVICES" footer={this.state.partners && Object.keys(this.state.partners).length > 0 && 'Tap to remove'}>
+
+            {this.state.isLinkingEnabled
+              && <Section header="LINKED DEVICES" footer={this.state.partners && Object.keys(this.state.partners).length > 0 && 'Tap to remove'}>
               {(() => {
                 switch (this.state.partners && Object.keys(this.state.partners).length > 0) {
                   case true:    return Object.keys(this.state.partners).map((uuid, i) => {
                     return <Cell
                       key={i}
                       cellstyle="RightDetail"
-                      title={this.state.partners[uuid].gender + ' ' + this.state.partners[uuid].username}
+                      title={this.state.partners[uuid].gender + ' ' + this.state.partners[uuid].name}
                       detail={uuid.slice(0, 8) + '...'}
                       onPress={() => that.removeLink(uuid)}
                     />;
@@ -277,6 +293,7 @@ export default class LinkView extends React.Component {
                 }
               })()}
             </Section>}
+
           </TableView>
         </ScrollView>
       </View>
@@ -322,7 +339,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   qrBlock: {
-    height: 360,
+    height: WIDTH,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center'

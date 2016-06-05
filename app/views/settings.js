@@ -13,6 +13,7 @@ import SettingStore from '../stores/setting-store';
 // 3rd party libraries
 import { Actions } from 'react-native-router-flux';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
+import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationBar from 'react-native-navbar';
 import store from 'react-native-simple-store';
@@ -86,6 +87,14 @@ export default class SettingsView extends React.Component {
                 title="Ovulation and Fertile"
                 detail={this.state.settings.OVULATION_FERTILE.VALUE + ' Days'}
                 onPress={() => Actions.ovulationFertileSettings()}
+              />
+            </Section>
+
+            <Section>
+              <Cell
+                cellstyle="RightDetail"
+                title="Version"
+                detail={DeviceInfo.getVersion() + '(' + DeviceInfo.getBuildNumber() + ')'}
               />
             </Section>
 
